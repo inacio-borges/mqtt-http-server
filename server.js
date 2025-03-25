@@ -1,9 +1,6 @@
-const http = require('http');
-const mqtt = require('mqtt');
-const express = require('express');
-const path = require('path');
+import http from 'http';
+import mqtt from 'mqtt';
 
-const app = express();
 const client = mqtt.connect('mqtt://broker.emqx.io');
 
 let sensorData = {};
@@ -26,11 +23,6 @@ client.on('message', (topic, message) => {
   } catch (error) {
     console.error('Error parsing MQTT message:', error);
   }
-});
-
-// Serve the Dashboard.html as the default page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'Dashboard.html'));
 });
 
 // HTTP server to handle API requests
@@ -67,6 +59,6 @@ const server = http.createServer((req, res) => {
 
 // Start the server on a dynamic port or fallback to 3000
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
