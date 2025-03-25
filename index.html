@@ -32,6 +32,7 @@
       <tr>
         <th>Field</th>
         <th>Value</th>
+        <th>Timestamp</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -49,6 +50,7 @@
         <th>Out Power</th>
         <th>Out RPM</th>
         <th>Temp</th>
+        <th>Timestamp</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -65,18 +67,23 @@
         if (!inverterResponse.ok) throw new Error(`Failed to fetch inverters: ${inverterResponse.status}`);
         const inverterData = await inverterResponse.json();
 
+        const timestamp = new Date().toLocaleString();
+
         // Populate sensor data
         const sensorTableBody = document.querySelector('#sensorTable tbody');
         sensorTableBody.innerHTML = '';
+        let sensorCount = 0;
         for (const [key, value] of Object.entries(sensorData)) {
-          const row = `<tr><td>${key}</td><td>${value}</td></tr>`;
+          if (sensorCount >= 10) break;
+          const row = `<tr><td>${key}</td><td>${value}</td><td>${timestamp}</td></tr>`;
           sensorTableBody.innerHTML += row;
+          sensorCount++;
         }
 
         // Populate inverter data
         const inverterTableBody = document.querySelector('#inverterTable tbody');
         inverterTableBody.innerHTML = '';
-        inverterData.forEach((inverter) => {
+        inverterData.slice(0, 10).forEach((inverter) => {
           const row = `
             <tr>
               <td>${inverter.id}</td>
@@ -87,6 +94,7 @@
               <td>${inverter.p}</td>
               <td>${inverter.rpm}</td>
               <td>${inverter.t}</td>
+              <td>${timestamp}</td>
             </tr>
           `;
           inverterTableBody.innerHTML += row;
