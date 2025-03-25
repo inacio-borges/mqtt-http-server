@@ -1,7 +1,7 @@
-import http from 'http';
-import mqtt from 'mqtt';
-import express from 'express';
-import path from 'path';
+const http = require('http');
+const mqtt = require('mqtt');
+const express = require('express');
+const path = require('path');
 
 const app = express();
 const client = mqtt.connect('mqtt://broker.emqx.io');
