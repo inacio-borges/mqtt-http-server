@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: embasa-server
+    env: node
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    plan: free
+    region: oregon # Escolha a região mais próxima de você
+    envVars:
+      - key: PORT
+        value: "3000" # Render define automaticamente a porta, mas pode ser sobrescrita
