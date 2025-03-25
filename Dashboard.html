@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard</h1>
+  <h2>Sensor Data</h2>
+  <table id="sensorTable">
+    <thead>
+      <tr>
+        <th>Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Inverter Data</h2>
+  <table id="inverterTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Model</th>
+        <th>Out Freq</th>
+        <th>Out Voltage</th>
+        <th>DC Voltage</th>
+        <th>Out Power</th>
+        <th>Out RPM</th>
+        <th>Temp</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchData() {
+      try {
+        const sensorResponse = await fetch('http://localhost:3000/api/sensors'); // Updated URL
+        if (!sensorResponse.ok) throw new Error(`Failed to fetch sensors: ${sensorResponse.status}`);
+        const sensorData = await sensorResponse.json();
+
+        const inverterResponse = await fetch('http://localhost:3000/api/inverters'); // Updated URL
+        if (!inverterResponse.ok) throw new Error(`Failed to fetch inverters: ${inverterResponse.status}`);
+        const inverterData = await inverterResponse.json();
+
+        // Populate sensor data
+        const sensorTableBody = document.querySelector('#sensorTable tbody');
+        sensorTableBody.innerHTML = '';
+        for (const [key, value] of Object.entries(sensorData)) {
+          const row = `<tr><td>${key}</td><td>${value}</td></tr>`;
+          sensorTableBody.innerHTML += row;
+        }
+
+        // Populate inverter data
+        const inverterTableBody = document.querySelector('#inverterTable tbody');
+        inverterTableBody.innerHTML = '';
+        inverterData.forEach((inverter) => {
+          const row = `
+            <tr>
+              <td>${inverter.id}</td>
+              <td>${inverter.m}</td>
+              <td>${inverter.f}</td>
+              <td>${inverter.v}</td>
+              <td>${inverter.dcv}</td>
+              <td>${inverter.p}</td>
+              <td>${inverter.rpm}</td>
+              <td>${inverter.t}</td>
+            </tr>
+          `;
+          inverterTableBody.innerHTML += row;
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    // Fetch data every 5 seconds
+    setInterval(fetchData, 5000);
+    fetchData();
+  </script>
+</body>
+</html>
