@@ -57,11 +57,11 @@
   <script>
     async function fetchData() {
       try {
-        const sensorResponse = await fetch('http://localhost:3000/api/sensors'); // Updated URL
+        const sensorResponse = await fetch('https://embasa-server.onrender.com/api/sensors'); // Updated URL
         if (!sensorResponse.ok) throw new Error(`Failed to fetch sensors: ${sensorResponse.status}`);
         const sensorData = await sensorResponse.json();
 
-        const inverterResponse = await fetch('http://localhost:3000/api/inverters'); // Updated URL
+        const inverterResponse = await fetch('https://embasa-server.onrender.com/api/inverters'); // Updated URL
         if (!inverterResponse.ok) throw new Error(`Failed to fetch inverters: ${inverterResponse.status}`);
         const inverterData = await inverterResponse.json();
 
