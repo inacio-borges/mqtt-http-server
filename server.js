@@ -1,5 +1,12 @@
 import http from 'http';
 import mqtt from 'mqtt';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Define __dirname for ES6 modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const client = mqtt.connect('mqtt://broker.emqx.io');
 
@@ -51,7 +58,7 @@ client.on('message', (topic, message) => {
   }
 });
 
-// HTTP server to handle API requests
+// HTTP server to handle API requests and serve static files
 const server = http.createServer((req, res) => {
   const { url, method } = req;
 
@@ -66,21 +73,46 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  if (method === 'GET') {
-    if (url === '/api/sensors') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(sensorData));
-    } else if (url === '/api/inverters') {
-      res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(inverterData)); 
+  // Serve static files from the 'build' directory
+  const filePath = path.join(__dirname, 'build', url === '/' ? 'index.html' : url);
+  fs.readFile(filePath, (err, data) => {
+    if (!err) {
+      const ext = path.extname(filePath).toLowerCase();
+      const mimeTypes = {
+        '.html': 'text/html',
+        '.js': 'application/javascript',
+        '.css': 'text/css',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.json': 'application/json',
+      };
+      const contentType = mimeTypes[ext] || 'application/octet-stream';
+      res.writeHead(200, { 'Content-Type': contentType });
+      res.end(data);
+    } else if (url.startsWith('/api/')) {
+      // Handle API requests
+      if (method === 'GET') {
+        if (url === '/api/sensors') {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(sensorData));
+        } else if (url === '/api/inverters') {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify(inverterData)); 
+        } else {
+          res.writeHead(404, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Not Found' }));
+        }
+      } else {
+        res.writeHead(405, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+      }
     } else {
-      res.writeHead(404, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Not Found' }));
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
+      res.end('404 Not Found');
     }
-  } else {
-    res.writeHead(405, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Method Not Allowed' }));
-  }
+  });
 });
 
 // Start the server on a dynamic port or fallback to 3000
