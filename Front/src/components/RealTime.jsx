@@ -11,7 +11,7 @@ function RealTime() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/plant");
+        const response = await fetch(`${window.location.origin}/api/plant`);
         const result = await response.json();
         setData(result);
       } catch (error) {
