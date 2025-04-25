@@ -10,10 +10,6 @@ services:
       - key: PORT
         value: "3000"
       - key: MQTT_BROKER_URL
-        value: "${{ MQTT_BROKER_URL }}"
+        value: "mqtt://broker.emqx.io"
       - key: MQTT_TOPICS
-        value: "${{ MQTT_TOPICS }}"
-      - key: NODE_ENV
-        value: "${{ NODE_ENV }}"
-      - key: API_BASE_URL
-        value: "${{ API_BASE_URL }}"
+        value: "global/sign_of_life,ClienteX/Instancia1/d00463004f8c/inverters,ClienteX/Instancia1/d00463004f8c/sensors"
