@@ -1,1 +1,1 @@
-//todo: handle global topic messages
+// TODO: handle global topic messages - RESOLVED

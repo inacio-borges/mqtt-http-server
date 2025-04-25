@@ -1,3 +1,5 @@
+// Este arquivo não está em uso no projeto atual. Pode ser removido ou arquivado se não for necessário.
+
 import http from "http";
 import mqtt from "mqtt";
 import fs, { stat } from "fs";
@@ -33,6 +35,7 @@ client.on("message", (topic, message) => {
     const data = JSON.parse(message.toString());
     if (topic === globalTopic) {
       console.log("plant alive");
+      //todo handle global topic to sign of life, do a function to check if the plant is alive
     } else if (topic === sensorTopic) {
       const newSensorData = {
         id: data.id,
@@ -165,8 +168,21 @@ function updatePlantData() {
   console.log("Plant data:", plantData);
 }
 
-// Run the updatePlantData function every 10 seconds (adjust as needed)
-setInterval(updatePlantData, updateInterval);
+// Ajustar o intervalo de atualização para evitar problemas de execução
+setInterval(() => {
+  try {
+    updatePlantData(); // Atualiza os dados da planta
+  } catch (error) {
+    console.error("Erro ao atualizar os dados da planta:", error);
+  }
+}, updateInterval);
+
+// Adicionar logs para monitorar o funcionamento do servidor
+console.log(
+  "Servidor configurado para atualizar os dados a cada",
+  updateInterval,
+  "ms"
+);
 
 // HTTP server to handle API requests and serve static files
 const server = http.createServer((req, res) => {
@@ -264,6 +280,11 @@ const server = http.createServer((req, res) => {
       res.end("404 Not Found");
     }
   });
+});
+
+// Garantir que o servidor continue rodando mesmo em caso de erros
+server.on("error", (err) => {
+  console.error("Erro no servidor:", err);
 });
 
 // Start the server on a dynamic port or fallback to 3000

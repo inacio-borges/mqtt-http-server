@@ -3,9 +3,17 @@ services:
     name: embasa-server
     env: node
     buildCommand: "npm install"
-    startCommand: "node server.js"
+    startCommand: "node src/server.js"
     plan: free
     region: oregon # Escolha a região mais próxima de você
     envVars:
       - key: PORT
-        value: "3000" # Render define automaticamente a porta, mas pode ser sobrescrita
+        value: "3000"
+      - key: MQTT_BROKER_URL
+        value: "${{ MQTT_BROKER_URL }}"
+      - key: MQTT_TOPICS
+        value: "${{ MQTT_TOPICS }}"
+      - key: NODE_ENV
+        value: "${{ NODE_ENV }}"
+      - key: API_BASE_URL
+        value: "${{ API_BASE_URL }}"
