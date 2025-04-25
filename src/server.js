@@ -10,11 +10,11 @@ const PORT = process.env.PORT || 3000;
 
 // Serve static files from the dist folder
 const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "Front/dist")));
+app.use(express.static(path.join(__dirname, "dist")));
 
 // Fallback to index.html for SPA routing
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "Front/dist", "index.html"));
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 app.listen(PORT, () => {
