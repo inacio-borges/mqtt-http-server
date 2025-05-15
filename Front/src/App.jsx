@@ -43,7 +43,7 @@ function App() {
                 borderRadius: "0.25rem",
               }}
             >
-              <Link to="/history">Histórico</Link>
+              <Link to="/history">Gráfico</Link>
             </button>
             <button
               style={{

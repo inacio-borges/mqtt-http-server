@@ -33,7 +33,7 @@ function RealTime() {
         <h2>{instance}</h2>
         <h4>Detalhes do Sistema</h4>
         <div className="system-details">
-          <div className="sensors">
+          <div className="inverter-container">
             <img
               src={qgbtImage}
               alt="icone-quadro"
@@ -77,45 +77,82 @@ function RealTime() {
           </div>
           {/* Motores */}
           <div className="motors-section">
-            <h4>Motores</h4>
             {data.motors &&
-              data.motors.map((motor, idx) => (
-                <div
-                  className="motor-container"
-                  key={idx}
-                  style={{
-                    marginBottom: "10px",
-                    border: "1px solid #ccc",
-                    borderRadius: "5px",
-                    padding: "10px",
-                  }}
-                >
-                  <h5>
-                    {motor.name} (Endereço: {motor.address})
-                  </h5>
-                  <p>
-                    <strong>Temperatura:</strong> {motor.temperature / 10} °C
-                  </p>
-                  <p>
-                    <strong>Vibração X:</strong> {motor.vibration_x}
-                  </p>
-                  <p>
-                    <strong>Vibração Y:</strong> {motor.vibration_y}
-                  </p>
-                  <p>
-                    <strong>Vibração Z:</strong> {motor.vibration_z}
-                  </p>
-                  <p>
-                    <strong>Deslocamento X:</strong> {motor.displacement_x}
-                  </p>
-                  <p>
-                    <strong>Deslocamento Y:</strong> {motor.displacement_y}
-                  </p>
-                  <p>
-                    <strong>Deslocamento Z:</strong> {motor.displacement_z}
-                  </p>
-                </div>
-              ))}
+              data.motors.map((motor, idx) => {
+                // Mapeamento entre address do motor e do inversor (ajuste conforme necessário)
+                const motorToInverterAddress = {
+                  200: 10, // Motor 1 -> Inversor 10
+                  201: 10, // Motor 2 -> Inversor 11 (exemplo, ajuste conforme seu sistema)
+                };
+                const inverterAddress = motorToInverterAddress[motor.address];
+                const inverter =
+                  data.inverters &&
+                  data.inverters.find((inv) => inv.address === inverterAddress);
+                // Considera rodando se interpretedStatus contém exatamente "Em operação" (não "Sem operação")
+                const running =
+                  inverter && Array.isArray(inverter?.interpretedStatus)
+                    ? inverter.interpretedStatus.some(
+                        (status) =>
+                          status &&
+                          status
+                            .normalize("NFD")
+                            .replace(/[\u0300-\u036f]/g, "")
+                            .toLowerCase() === "em operacao"
+                      )
+                    : false;
+                return (
+                  <div>
+                    <div className="inverter-container" key={idx}>
+                      <img
+                        src={
+                          running
+                            ? "images/motor-spinning.gif"
+                            : "images/motor-stoped.png"
+                        }
+                        alt="Motor"
+                        style={{
+                          height: "150px",
+                          objectFit: "cover",
+                          marginBottom: "10px",
+                          borderRadius: "5px",
+                        }}
+                      />
+
+                      {/* Conteúdo do motor */}
+                      <div className="inverter-details" key={idx}>
+                        <h5>
+                          {motor.name} (Endereço: {motor.address})
+                        </h5>
+                        <p>
+                          <strong>Temperatura:</strong> {motor.temperature / 10}{" "}
+                          °C
+                        </p>
+                        <p>
+                          <strong>Vibração X:</strong> {motor.vibration_x}
+                        </p>
+                        <p>
+                          <strong>Vibração Y:</strong> {motor.vibration_y}
+                        </p>
+                        <p>
+                          <strong>Vibração Z:</strong> {motor.vibration_z}
+                        </p>
+                        <p>
+                          <strong>Deslocamento X:</strong>{" "}
+                          {motor.displacement_x}
+                        </p>
+                        <p>
+                          <strong>Deslocamento Y:</strong>{" "}
+                          {motor.displacement_y}
+                        </p>
+                        <p>
+                          <strong>Deslocamento Z:</strong>{" "}
+                          {motor.displacement_z}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
           {data.inverters.map((item, index) => {
             return (

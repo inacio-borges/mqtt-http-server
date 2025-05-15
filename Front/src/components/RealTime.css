@@ -21,8 +21,9 @@
   display: flex;
   flex-direction: row;
   align-items: stretch;
-  width: 95%;
-
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
   text-align: center;
 }
 .inverter-container {
@@ -31,11 +32,45 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 95%;
+  width: 100%;
   padding: 5px;
   border-radius: 5px;
   margin-bottom: 20px;
-  margin-left: 10px;
+  margin-left: 0;
+  margin-right: 0;
+}
+.motors-section {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 24px;
+  min-width: 270px;
+  width: 100%;
+  background: none;
+  border: none;
+  margin-left: 24px;
+  margin-right: 24px;
+  padding-left: 8px;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+.motor-container {
+  text-align: left;
+  border: 2px solid #ccc;
+  padding: 10px;
+  border-radius: 10px;
+  background: #eaeaea;
+  min-width: 220px;
+  max-width: 260px;
+  flex: 1 1 220px;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  width: 100%;
+}
+.motors-section h4 {
+  width: 100%;
+  flex-basis: 100%;
 }
 .inverter-details {
   text-align: left;
@@ -50,8 +85,9 @@
   flex-direction: column;
   align-items: center;
   border-radius: 5px;
-  margin-bottom: 20px;
-  margin-left: 10px;
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: 0;
   padding: 10px;
   width: 100%;
   min-width: 270px;
@@ -63,5 +99,22 @@
   .system-details {
     flex-direction: column;
     align-items: center;
+  }
+}
+@media (max-width: 1100px) {
+  .system-details {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .sensors,
+  .motors-section,
+  .inverter-container {
+    max-width: 98vw;
+    min-width: 220px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 }

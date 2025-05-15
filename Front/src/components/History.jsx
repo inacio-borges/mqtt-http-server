@@ -1,88 +1,256 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { usePlantData } from "./PlantDataContext";
 import "./History.css";
 
-function History() {
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const getAllVariableOptions = (plantData) => {
+  const options = [
+    { label: "Corrente R", value: "current_r", type: "main" },
+    { label: "Corrente S", value: "current_s", type: "main" },
+    { label: "Corrente T", value: "current_t", type: "main" },
+    { label: "Tensão R", value: "voltage_r", type: "main" },
+    { label: "Tensão S", value: "voltage_s", type: "main" },
+    { label: "Tensão T", value: "voltage_t", type: "main" },
+    { label: "Saída Digital 1", value: "dOut[0]", type: "main" },
+    { label: "Saída Digital 2", value: "dOut[1]", type: "main" },
+    { label: "Saída Digital 3", value: "dOut[2]", type: "main" },
+    { label: "Saída Digital 4", value: "dOut[4]", type: "main" },
+    { label: "Saída Digital 5", value: "dOut[5]", type: "main" },
+  ];
+  // Inversores dinâmicos
+  if (plantData && Array.isArray(plantData.inverters)) {
+    plantData.inverters.forEach((inv, idx) => {
+      options.push({
+        label: `Frequência Inversor ${idx + 1}`,
+        value: `inverter_${idx}_frequency`,
+        type: "inverter",
+      });
+      options.push({
+        label: `Tensão Inversor ${idx + 1}`,
+        value: `inverter_${idx}_voltage`,
+        type: "inverter",
+      });
+      options.push({
+        label: `Corrente Inversor ${idx + 1}`,
+        value: `inverter_${idx}_current`,
+        type: "inverter",
+      });
+      options.push({
+        label: `Temperatura Inversor ${idx + 1}`,
+        value: `inverter_${idx}_temperature`,
+        type: "inverter",
+      });
+      options.push({
+        label: `Potência Inversor ${idx + 1}`,
+        value: `inverter_${idx}_power`,
+        type: "inverter",
+      });
+    });
+  }
+  // Motores dinâmicos
+  if (plantData && Array.isArray(plantData.motors)) {
+    plantData.motors.forEach((motor, idx) => {
+      options.push({
+        label: `Temperatura Motor ${idx + 1}`,
+        value: `motor_${idx}_temperature`,
+        type: "motor",
+      });
+      options.push({
+        label: `Vibração X Motor ${idx + 1}`,
+        value: `motor_${idx}_vibration_x`,
+        type: "motor",
+      });
+      options.push({
+        label: `Vibração Y Motor ${idx + 1}`,
+        value: `motor_${idx}_vibration_y`,
+        type: "motor",
+      });
+      options.push({
+        label: `Vibração Z Motor ${idx + 1}`,
+        value: `motor_${idx}_vibration_z`,
+        type: "motor",
+      });
+      options.push({
+        label: `Deslocamento X Motor ${idx + 1}`,
+        value: `motor_${idx}_displacement_x`,
+        type: "motor",
+      });
+      options.push({
+        label: `Deslocamento Y Motor ${idx + 1}`,
+        value: `motor_${idx}_displacement_y`,
+        type: "motor",
+      });
+      options.push({
+        label: `Deslocamento Z Motor ${idx + 1}`,
+        value: `motor_${idx}_displacement_z`,
+        type: "motor",
+      });
+    });
+  }
+  return options;
+};
+
+function extractValue(plantData, selectedVar) {
+  if (!plantData) return null;
+  if (selectedVar.startsWith("dOut")) {
+    const idx = parseInt(selectedVar.match(/\d+/)[0], 10);
+    return Array.isArray(plantData.dOut) ? plantData.dOut[idx] : null;
+  }
+  if (selectedVar.startsWith("inverter_")) {
+    const [, idx, field] = selectedVar.match(/inverter_(\d+)_(.+)/) || [];
+    if (
+      idx !== undefined &&
+      field &&
+      plantData.inverters &&
+      plantData.inverters[idx]
+    ) {
+      return plantData.inverters[idx][field];
+    }
+    return null;
+  }
+  if (selectedVar.startsWith("motor_")) {
+    const [, idx, field] = selectedVar.match(/motor_(\d+)_(.+)/) || [];
+    if (
+      idx !== undefined &&
+      field &&
+      plantData.motors &&
+      plantData.motors[idx]
+    ) {
+      return plantData.motors[idx][field];
+    }
+    return null;
+  }
+  return plantData[selectedVar];
+}
+
+function HistoricoGrafico() {
+  const plantData = usePlantData();
   const [data, setData] = useState([]);
+  const [selectedVar, setSelectedVar] = useState("current_r");
+  const dataBuffer = useRef([]);
+  const variableOptions = getAllVariableOptions(plantData);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${window.location.origin}/api/plant`);
-        const result = await response.json();
-        setData((prevData) => {
-          const newData = [result, ...prevData];
-          return newData.slice(0, 20); // Keep only the 20 most recent entries
-        });
-      } catch (error) {
-        console.error("Error fetching data:", error);
+    const value = extractValue(plantData, selectedVar);
+    if (value !== undefined && value !== null) {
+      dataBuffer.current.push({
+        value,
+        createdAt: plantData.createdAt,
+      });
+      if (dataBuffer.current.length > 100) {
+        dataBuffer.current.shift();
       }
-    };
+      setData([...dataBuffer.current]);
+    }
+  }, [plantData, selectedVar]);
 
-    const interval = setInterval(fetchData, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  useEffect(() => {
+    dataBuffer.current = [];
+    setData([]);
+  }, [selectedVar]);
+
+  const chartData = {
+    labels: data.map((d) =>
+      d.createdAt ? new Date(d.createdAt).toLocaleTimeString() : ""
+    ),
+    datasets: [
+      {
+        label:
+          variableOptions.find((v) => v.value === selectedVar)?.label ||
+          "Variável",
+        data: data.map((d) => d.value),
+        borderColor: "#bbb",
+        backgroundColor: "rgba(180,180,180,0.15)",
+        tension: 0.3,
+        pointRadius: 3,
+        pointBackgroundColor: "#fff",
+        pointBorderColor: "#bbb",
+      },
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: { display: true, labels: { color: "#ccc" } },
+      title: {
+        display: true,
+        text: "Histórico da Variável",
+        color: "#bbb",
+        font: { size: 26, weight: "bold" },
+      },
+      tooltip: {
+        backgroundColor: "#232323",
+        titleColor: "#bbb",
+        bodyColor: "#fff",
+        borderColor: "#bbb",
+        borderWidth: 1,
+      },
+    },
+    scales: {
+      x: {
+        title: { display: true, text: "Horário", color: "#ccc" },
+        ticks: { color: "#ccc" },
+        grid: { color: "#444" },
+      },
+      y: {
+        title: { display: true, text: "Valor", color: "#ccc" },
+        ticks: { color: "#ccc" },
+        grid: { color: "#444" },
+      },
+    },
+  };
 
   return (
-    <div className="history-container">
-      <h1>Histórico</h1>
-      <div className="table-wrapper">
-        <table className="responsive-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Current R</th>
-              <th>Current S</th>
-              <th>Current T</th>
-              <th>Voltage R</th>
-              <th>Voltage S</th>
-              <th>Voltage T</th>
-              <th>Motor Vibration X</th>
-              <th>Motor Vibration Y</th>
-              <th>Motor Vibration Z</th>
-              <th>Motor Temperature</th>
-              <th>Level</th>
-              <th>Created At</th>
-              <th>Inverter Address</th>
-              <th>Inverter Model</th>
-              <th>Inverter Frequency</th>
-              <th>Inverter Voltage</th>
-              <th>Inverter Power</th>
-              <th>Inverter Current</th>
-              <th>Inverter Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((entry, index) =>
-              entry.inverters.map((inverter, i) => (
-                <tr key={`${index}-${i}`}>
-                  <td>{entry.id}</td>
-                  <td>{entry.current_r}</td>
-                  <td>{entry.current_s}</td>
-                  <td>{entry.current_t}</td>
-                  <td>{entry.voltage_r}</td>
-                  <td>{entry.voltage_s}</td>
-                  <td>{entry.voltage_t}</td>
-                  <td>{entry.motor_vibration_x}</td>
-                  <td>{entry.motor_vibration_y}</td>
-                  <td>{entry.motor_vibration_z}</td>
-                  <td>{entry.motor_temperature}</td>
-                  <td>{entry.level}</td>
-                  <td>{new Date(entry.createdAt).toLocaleString()}</td>
-                  <td>{inverter.address}</td>
-                  <td>{inverter.model}</td>
-                  <td>{inverter.frequency}</td>
-                  <td>{inverter.voltage}</td>
-                  <td>{inverter.power}</td>
-                  <td>{inverter.current}</td>
-                  <td>{inverter.status}</td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+    <div
+      className="history-container"
+      style={{
+        maxWidth: "98vw",
+        minHeight: 700,
+        width: "100%",
+        margin: "0 auto",
+      }}
+    >
+      <h1>Gráfico de Variáveis</h1>
+      <div style={{ marginBottom: 16 }}>
+        <label htmlFor="var-select">Selecione a variável: </label>
+        <select
+          id="var-select"
+          value={selectedVar}
+          onChange={(e) => setSelectedVar(e.target.value)}
+        >
+          {variableOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="chart-modern" style={{ minHeight: 600, width: "100%" }}>
+        <Line data={chartData} options={chartOptions} />
       </div>
     </div>
   );
 }
 
-export default History;
+export default HistoricoGrafico;

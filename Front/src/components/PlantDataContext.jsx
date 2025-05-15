@@ -8,11 +8,13 @@ export function PlantDataProvider({ children }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const isDev = import.meta.env.MODE === "development";
+        const baseUrl = isDev ? "http://localhost:3000" : "";
         // Busca dados do plant
-        const plantResponse = await fetch(`/api/plant`);
+        const plantResponse = await fetch(`${baseUrl}/api/plant`);
         const plantResult = await plantResponse.json();
         // Busca status dos inversores
-        const statusResponse = await fetch(`/api/status`);
+        const statusResponse = await fetch(`${baseUrl}/api/status`);
         const statusResult = await statusResponse.json();
         // Mescla interpretedStatus e statusHex nos inverters
         const invertersWithStatus = (plantResult.inverters || []).map((inv) => {
@@ -30,9 +32,45 @@ export function PlantDataProvider({ children }) {
         console.error("Error fetching data:", error);
       }
     };
-    const interval = setInterval(fetchData, 1000);
+    const interval = setInterval(fetchData, 100);
     return () => clearInterval(interval);
   }, []);
+
+  // Exemplo dos campos disponíveis em usePlantData():
+  // id
+  // createdAt
+  // current_r
+  // current_s
+  // current_t
+  // voltage_r
+  // voltage_s
+  // voltage_t
+  // dIn (array)
+  // dOut (array)
+  // inverters (array de objetos):
+  //    - id
+  //    - address
+  //    - model
+  //    - frequency
+  //    - voltage
+  //    - DcVoltage
+  //    - power
+  //    - rpm
+  //    - temperature
+  //    - current
+  //    - status
+  //    - faultLog (array)
+  // motors (array de objetos):
+  //    - id
+  //    - address
+  //    - name
+  //    - temperature
+  //    - vibration_x
+  //    - vibration_y
+  //    - vibration_z
+  //    - displacement_x
+  //    - displacement_y
+  //    - displacement_z
 
   return (
     <PlantDataContext.Provider value={data}>
