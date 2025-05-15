@@ -1,0 +1,237 @@
+.planta-root {
+  min-height: 100%;
+
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.planta-main-row {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+}
+
+.planta-panel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2.5rem;
+}
+
+.planta-motors-row {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+  border: 2px solid #bdbdbd;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+}
+
+.panel {
+  background: #eaeaea;
+  border: 2px solid #bdbdbd;
+  border-radius: 0.5rem;
+  width: 260px;
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  box-shadow: 0 2px 12px #bbb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.panel-fases {
+  display: grid;
+
+  grid-template-columns: repeat(3, 78px);
+  width: calc(3 * 60px + 2 * 1.1rem);
+  margin-bottom: 0.3rem;
+  border-radius: 6px;
+  padding: 0.18rem 0;
+
+  border: 1.5px solid #b97a00;
+  background: #fffbe7;
+  box-shadow: 0 1px 2px #e0c080;
+}
+
+.panel-fase {
+  width: 60px;
+  text-align: center;
+  font-weight: bold;
+  gap: 0.5rem;
+
+  color: #b97a00;
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-displays {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 1.1rem;
+  margin-bottom: 1.2rem;
+}
+
+.panel-display {
+  background: #222;
+  color: #fff;
+  border-radius: 0.3rem;
+  box-shadow: 0 1px 4px #888;
+  padding: 0.3rem 0;
+  text-align: center;
+  font-family: monospace;
+  font-size: 1.6rem;
+  font-weight: bold;
+  width: 60px;
+  height: 48px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.panel-display-unit {
+  font-size: 0.9rem;
+  color: #bbb;
+  font-weight: normal;
+}
+
+.panel-chave-row {
+  width: 220px;
+  display: flex;
+  align-content: right;
+  margin-top: 4rem;
+}
+
+.panel-chave {
+  width: 22px;
+  height: 44px;
+  background: #222;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px #888;
+  display: flex;
+  justify-content: center;
+}
+
+.panel-chave-inner {
+  width: 8px;
+  height: 28px;
+  background: #444;
+  border-radius: 2px;
+}
+
+.panel-calha {
+  width: 100px;
+  height: 102px;
+  background: linear-gradient(180deg, #bdbdbd 60%, #888 100%);
+  border-radius: 0 0 18px 18px;
+  margin-top: -8px;
+  box-shadow: 0 4px 10px #aaa;
+  border: 2px solid #bdbdbd;
+  border-top: none;
+}
+
+.motor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.motor-info {
+  margin-bottom: 0.5rem;
+  color: black;
+  border: 2px solid #bdbdbd;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #eaeaea;
+}
+
+.motor-img {
+  width: 12rem;
+  height: 12rem;
+  object-fit: contain;
+}
+
+.motor-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.25rem;
+}
+
+@media (max-width: 700px) {
+  .planta-root {
+    padding: 1rem 0.2rem;
+  }
+  .planta-main-row {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .planta-panel-container {
+    margin-bottom: 1.2rem;
+  }
+  .planta-motors-row {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+  .panel {
+    width: 98vw;
+    max-width: 240px;
+    padding: 1.2rem 0.5rem 1rem 0.5rem;
+  }
+  .panel-fases {
+    grid-template-columns: repeat(3, 1fr);
+    width: 66%;
+    font-size: 1rem;
+  }
+  .panel-fase {
+    width: 100%;
+    font-size: 1.1rem;
+  }
+  .panel-displays {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.2rem;
+    justify-items: center;
+    align-items: center;
+  }
+  .panel-display {
+    font-size: 1.1rem;
+    width: 48px;
+    height: 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .panel-chave-row {
+    width: 100%;
+    margin-top: 2rem;
+  }
+  .panel-calha {
+    width: 80px;
+    height: 70px;
+  }
+  .motor-img {
+    width: 7rem;
+    height: 7rem;
+  }
+  .motor-info {
+    font-size: 0.95rem;
+  }
+  .motor-btn {
+    font-size: 1rem;
+    padding: 0.4rem 0.7rem;
+  }
+}

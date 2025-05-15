@@ -4,11 +4,22 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const CLIENT_INSTANCE =
+  process.env.INSTANCE_NAME + "/" + process.env.INSTANCE_UID;
 const TOPIC_SIGN_OF_LIFE = process.env.TOPIC_SIGN_OF_LIFE;
-const TOPIC_SENSORS = process.env.TOPIC_SENSORS;
-const TOPIC_INVERTERS = process.env.TOPIC_INVERTERS;
+const TOPIC_SENSORS =
+  process.env.CLIENT_NAME + "/" + CLIENT_INSTANCE + "/sensors";
+const TOPIC_INVERTERS =
+  process.env.CLIENT_NAME + "/" + CLIENT_INSTANCE + "/inverters";
+const TOPIC_MOTORS =
+  process.env.CLIENT_NAME + "/" + CLIENT_INSTANCE + "/motors";
 
-const MQTT_TOPICS = [TOPIC_SIGN_OF_LIFE, TOPIC_SENSORS, TOPIC_INVERTERS];
+const MQTT_TOPICS = [
+  TOPIC_SIGN_OF_LIFE,
+  TOPIC_SENSORS,
+  TOPIC_INVERTERS,
+  TOPIC_MOTORS,
+];
 
 const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || "mqtt://broker.emqx.io";
 
@@ -18,6 +29,7 @@ let isServiceRunningLogged = false;
 
 client.on("connect", () => {
   console.log("Connected to MQTT broker");
+  console.log("Subscribing to topics:", MQTT_TOPICS);
   client.subscribe(MQTT_TOPICS);
   isServiceRunningLogged = false; // Reset flag on reconnect
 });
@@ -45,8 +57,7 @@ client.on("message", async (topic, message) => {
     console.log("MQTT service is running...");
     isServiceRunningLogged = true; // Log only once until the next reconnect or offline event
   }
-  // console.log(`Message received on topic ${topic}`);
-  // console.log("Message received:", message.toString());
+
   try {
     const data = JSON.parse(message.toString());
 
@@ -66,11 +77,8 @@ client.on("message", async (topic, message) => {
         voltage_r: data.s.vR,
         voltage_s: data.s.vS,
         voltage_t: data.s.vT,
-        motor_vibration_x: data.s.vibX,
-        motor_vibration_y: data.s.vibY,
-        motor_vibration_z: data.s.vibZ,
-        motor_temperature: parseFloat(data.s.temp / 10),
-        level: data.s.lvl,
+        dIn: data.s.dIn,
+        dOut: data.s.dOut,
       };
       console.log("Sensor data received:", newSensorData);
       await PlantService.handleMqttMessage(topic, {
@@ -121,6 +129,28 @@ client.on("message", async (topic, message) => {
       );
       await PlantService.handleMqttMessage(topic, {
         i: newInverterData,
+        id: data.id,
+      });
+    } else if (topic === TOPIC_MOTORS) {
+      if (!data.m || !data.id) {
+        console.warn("Incomplete motor data. Skipping save.", data);
+        return;
+      }
+      const newMotorData = {
+        id: data.id,
+        address: data.m.ad, // Garante que address está presente
+        name: data.m.n,
+        temperature: data.m.t,
+        vibration_x: data.m.vX,
+        vibration_y: data.m.vY,
+        vibration_z: data.m.vZ,
+        displacement_x: data.m.dX,
+        displacement_y: data.m.dY,
+        displacement_z: data.m.dZ,
+      };
+      console.log("Motor data received:", newMotorData);
+      await PlantService.handleMqttMessage(topic, {
+        m: newMotorData,
         id: data.id,
       });
     }

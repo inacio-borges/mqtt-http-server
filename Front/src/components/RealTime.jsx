@@ -1,48 +1,36 @@
-import React, { useState, useEffect } from "react";
-import fc302Image from "../assets/fc302.jpg";
-import fc202Image from "../assets/fc202.jpg";
-import cfw500Image from "../assets/cfw500.jpg";
-import qgbtImage from "../assets/qgbt.avif";
+import React from "react";
+import { usePlantData } from "./PlantDataContext";
+import fc302Image from "/assets/fc302.jpg";
+import fc202Image from "/assets/fc202.jpg";
+import cfw500Image from "/assets/cfw500.jpg";
+import qgbtImage from "/assets/qgbt.avif";
+import fc51Image from "/assets/fc51.webp"; // Adicione a imagem se existir
 import "./RealTime.css";
 
 function RealTime() {
-  const [data, setData] = useState({ sensors: {}, inverters: [] });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${window.location.origin}/api/plant`);
-        const result = await response.json();
-        setData(result);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    const interval = setInterval(fetchData, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const data = usePlantData();
 
   const getImageForInverter = (model) => {
     const images = {
       fc302: fc302Image,
       fc202: fc202Image,
       cfw500: cfw500Image,
+      fc51: fc51Image,
     };
     return (
       images[model] ||
       "https://res.cloudinary.com/rsc/image/upload/b_rgb:FFFFFF,c_pad,dpr_2.625,f_auto,h_214,q_auto,w_380/c_pad,h_214,w_380/R8918833-01?pgw=1"
     );
   };
-  const idParts = (data.id || "Unknown Client/Unknown Instance").split("/"); // Safely split the id
+  const idParts = (data.id || "Unknown Client/Unknown Instance").split("/");
   const client = idParts[0] || "Unknown Client";
   const instance = idParts[1] || "Unknown Instance";
 
   return (
     <div className="real-time-page">
       <div className="real-time-container" style={{}}>
-        <h1>{client}</h1> {/* Cliente como H1 */}
-        <h2>{instance}</h2> {/* Instância como subtítulo */}
+        <h1>{client}</h1>
+        <h2>{instance}</h2>
         <h4>Detalhes do Sistema</h4>
         <div className="system-details">
           <div className="sensors">
@@ -50,6 +38,7 @@ function RealTime() {
               src={qgbtImage}
               alt="icone-quadro"
               style={{
+                filter: "invert(0.9)",
                 height: "150px",
                 objectFit: "cover",
                 marginBottom: "10px",
@@ -76,23 +65,57 @@ function RealTime() {
                 <strong>Tensão T:</strong> {data.voltage_t} V
               </p>
               <p>
-                <strong>Vibração do Motor X:</strong> {data.motor_vibration_x}
+                <strong>Entradas Digitais (dIn):</strong>{" "}
+                {data.dIn && data.dIn.join(", ")}
               </p>
               <p>
-                <strong>Vibração do Motor Y:</strong> {data.motor_vibration_y}
-              </p>
-              <p>
-                <strong>Vibração do Motor Z:</strong> {data.motor_vibration_z}
-              </p>
-              <p>
-                <strong>Temperatura do Motor:</strong> {data.motor_temperature}{" "}
-                °C
-              </p>
-              <p>
-                <strong>Nível:</strong> {data.level}
+                <strong>Saídas Digitais (dOut):</strong>{" "}
+                {data.dOut && data.dOut.join(", ")}
               </p>
               <p>{data.createdAt}</p>
             </div>
+          </div>
+          {/* Motores */}
+          <div className="motors-section">
+            <h4>Motores</h4>
+            {data.motors &&
+              data.motors.map((motor, idx) => (
+                <div
+                  className="motor-container"
+                  key={idx}
+                  style={{
+                    marginBottom: "10px",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    padding: "10px",
+                  }}
+                >
+                  <h5>
+                    {motor.name} (Endereço: {motor.address})
+                  </h5>
+                  <p>
+                    <strong>Temperatura:</strong> {motor.temperature / 10} °C
+                  </p>
+                  <p>
+                    <strong>Vibração X:</strong> {motor.vibration_x}
+                  </p>
+                  <p>
+                    <strong>Vibração Y:</strong> {motor.vibration_y}
+                  </p>
+                  <p>
+                    <strong>Vibração Z:</strong> {motor.vibration_z}
+                  </p>
+                  <p>
+                    <strong>Deslocamento X:</strong> {motor.displacement_x}
+                  </p>
+                  <p>
+                    <strong>Deslocamento Y:</strong> {motor.displacement_y}
+                  </p>
+                  <p>
+                    <strong>Deslocamento Z:</strong> {motor.displacement_z}
+                  </p>
+                </div>
+              ))}
           </div>
           {data.inverters.map((item, index) => {
             return (
@@ -141,7 +164,9 @@ function RealTime() {
                     <strong>
                       Histórico de Falhas: <br />
                     </strong>{" "}
-                    {item.faultLog.join(", ")}
+                    {item.faultLog && item.faultLog.length > 0
+                      ? item.faultLog.join(", ")
+                      : "Sem falhas"}
                   </p>
                 </div>
               </div>

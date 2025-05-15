@@ -1,28 +1,64 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import Login from "./components/Login";
+
 import History from "./components/History";
 import RealTime from "./components/RealTime";
+import Planta from "./components/Planta";
 
 function App() {
   return (
     <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
+      <div
+        style={{
+          padding: "2rem",
+          backgroundColor: "#f9fafb",
+          border: "3px solid #ccc",
+          borderRadius: "0.5rem",
+          margin: "2rem",
+        }}
+      >
+        <nav
+          style={{
+            marginTop: "1rem",
+
+            padding: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <button
+              style={{
+                backgroundColor: "transparent",
+                border: "1px solid #e5e7eb",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.25rem",
+              }}
+            >
               <Link to="/">Planta</Link>
-            </li>
-            <li>
+            </button>
+            <button
+              style={{
+                backgroundColor: "transparent",
+                border: "1px solid #e5e7eb",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.25rem",
+              }}
+            >
               <Link to="/history">Histórico</Link>
-            </li>
-            <li>
-              <Link to="/realtime">Detalhes do Sistema</Link>
-            </li>
-          </ul>
+            </button>
+            <button
+              style={{
+                backgroundColor: "transparent",
+                border: "1px solid #e5e7eb",
+                padding: "0.5rem 1rem",
+                borderRadius: "0.25rem",
+              }}
+            >
+              <Link to="/realtime">Dados da Planta</Link>
+            </button>
+          </div>
         </nav>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Planta />} />
           <Route path="/history" element={<History />} />
           <Route path="/realtime" element={<RealTime />} />
         </Routes>
