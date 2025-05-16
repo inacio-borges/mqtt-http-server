@@ -179,45 +179,83 @@ function HistoricoGrafico() {
           variableOptions.find((v) => v.value === selectedVar)?.label ||
           "Variável",
         data: data.map((d) => d.value),
-        borderColor: "#bbb",
-        backgroundColor: "rgba(180,180,180,0.15)",
+        borderColor: "rgb(0 0 255)", // azul principal
+        borderWidth: 3,
+        backgroundColor: "rgb(0 0 255)", // azul claro com transparência
         tension: 0.3,
-        pointRadius: 3,
+        pointRadius: 0,
         pointBackgroundColor: "#fff",
-        pointBorderColor: "#bbb",
+        pointBorderColor: "#3b82f6",
+        pointHoverBackgroundColor: "#3b82f6",
+        pointHoverBorderColor: "#fff",
+        fill: true,
       },
     ],
+  };
+
+  // Plugin para forçar fundo branco no canvas do Chart.js
+  const whiteBgPlugin = {
+    id: 'customWhiteBackground',
+    beforeDraw: (chart, args, options) => {
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-over';
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+      ctx.restore();
+    },
   };
 
   const chartOptions = {
     responsive: true,
     plugins: {
-      legend: { display: true, labels: { color: "#ccc" } },
+      legend: { display: true, labels: { color: "#222", font: { weight: "bold" } } },
       title: {
         display: true,
         text: "Histórico da Variável",
-        color: "#bbb",
+        color: "#222",
         font: { size: 26, weight: "bold" },
       },
       tooltip: {
-        backgroundColor: "#232323",
-        titleColor: "#bbb",
-        bodyColor: "#fff",
+        backgroundColor: "#fff",
+        titleColor: "#222",
+        bodyColor: "#222",
         borderColor: "#bbb",
         borderWidth: 1,
       },
+      customWhiteBackground: whiteBgPlugin,
     },
     scales: {
       x: {
-        title: { display: true, text: "Horário", color: "#ccc" },
-        ticks: { color: "#ccc" },
-        grid: { color: "#444" },
+        title: { display: true, text: "Horário", color: "#222" },
+        ticks: { color: "#222" },
+        grid: { color: "#eee" },
       },
       y: {
-        title: { display: true, text: "Valor", color: "#ccc" },
-        ticks: { color: "#ccc" },
-        grid: { color: "#444" },
+        title: { display: true, text: "Valor", color: "#222" },
+        ticks: { color: "#222" },
+        grid: { color: "#eee" },
+        // Ajuste automático da escala com margem de 10%
+        beginAtZero: false,
+        suggestedMin: (() => {
+          if (data.length === 0) return 0;
+          const min = Math.min(...data.map((d) => d.value));
+          const max = Math.max(...data.map((d) => d.value));
+          const margin = (max - min) * 0.5;
+          return min - margin;
+        })(),
+        suggestedMax: (() => {
+          if (data.length === 0) return 1;
+          const min = Math.min(...data.map((d) => d.value));
+          const max = Math.max(...data.map((d) => d.value));
+          const margin = (max - min) * 0.5;
+          return max + margin;
+        })(),
       },
+    },
+    layout: {
+      padding: 24,
     },
   };
 
@@ -246,8 +284,8 @@ function HistoricoGrafico() {
           ))}
         </select>
       </div>
-      <div className="chart-modern" style={{ minHeight: 600, width: "100%" }}>
-        <Line data={chartData} options={chartOptions} />
+      <div className="chart-modern" style={{ minHeight: 600, width: "95%", background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #0001' }}>
+        <Line data={chartData} options={chartOptions} plugins={[whiteBgPlugin]} />
       </div>
     </div>
   );

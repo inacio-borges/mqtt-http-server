@@ -20,8 +20,8 @@ function App() {
         <nav
           style={{
             marginTop: "1rem",
-
             padding: "1rem",
+            color: "green", // cor da fonte azul
           }}
         >
           <div style={{ display: "flex", gap: "1rem" }}>
