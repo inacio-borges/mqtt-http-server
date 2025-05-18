@@ -9,7 +9,13 @@ export function PlantDataProvider({ children }) {
     const fetchData = async () => {
       try {
         const isDev = import.meta.env.MODE === "development";
-        const baseUrl = isDev ? "http://192.168.62.80:3000" : "";
+        const isPreview = import.meta.env.MODE === "preview";
+        let baseUrl = "";
+        if (isPreview) {
+          baseUrl = "http://192.168.62.80:3000";
+        } else if (isDev) {
+          baseUrl = "http://localhost:3000";
+        }
         // Busca dados do plant
         const plantResponse = await fetch(`${baseUrl}/api/plant`);
         const plantResult = await plantResponse.json();

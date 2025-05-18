@@ -1,6 +1,5 @@
 .planta-root {
   min-height: 100%;
-
   padding: 2.5rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -10,7 +9,8 @@
 
 .planta-main-row {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   gap: 4rem;
 }
 
@@ -34,8 +34,8 @@
   background: #eaeaea;
   border: 2px solid #bdbdbd;
   border-radius: 0.5rem;
-  width: 260px;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  width: 338px;
+  padding: 2.6rem 1.95rem 1.95rem 1.95rem;
   box-shadow: 0 2px 12px #bbb;
   display: flex;
   flex-direction: column;
@@ -46,11 +46,11 @@
 .panel-fases {
   display: grid;
 
-  grid-template-columns: repeat(3, 78px);
-  width: calc(3 * 60px + 2 * 1.1rem);
+  grid-template-columns: repeat(3, 101px);
+  width: calc(3 * 78px + 2 * 1.43rem);
   margin-bottom: 0.3rem;
   border-radius: 6px;
-  padding: 0.18rem 0;
+  padding: 0.23rem 0;
 
   border: 1.5px solid #b97a00;
   background: #fffbe7;
@@ -58,13 +58,13 @@
 }
 
 .panel-fase {
-  width: 60px;
+  width: 78px;
   text-align: center;
   font-weight: bold;
   gap: 0.5rem;
 
   color: #b97a00;
-  font-size: 1.4rem;
+  font-size: 1.82rem;
   letter-spacing: 2px;
   display: flex;
   align-items: center;
@@ -73,9 +73,9 @@
 
 .panel-displays {
   display: grid;
-  grid-template-columns: repeat(3, 60px);
-  gap: 1.1rem;
-  margin-bottom: 1.2rem;
+  grid-template-columns: repeat(3, 78px);
+  gap: 1.43rem;
+  margin-bottom: 1.56rem;
 }
 
 .panel-display {
@@ -86,10 +86,10 @@
   padding: 0.3rem 0;
   text-align: center;
   font-family: monospace;
-  font-size: 1.6rem;
+  font-size: 2.08rem;
   font-weight: bold;
-  width: 60px;
-  height: 48px;
+  width: 78px;
+  height: 62px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -103,15 +103,15 @@
 }
 
 .panel-chave-row {
-  width: 220px;
+  width: 286px;
   display: flex;
   align-content: right;
-  margin-top: 4rem;
+  margin-top: 5.7rem;
 }
 
 .panel-chave {
-  width: 22px;
-  height: 44px;
+  width: 28px;
+  height: 57px;
   background: #222;
   border-radius: 4px;
   box-shadow: 0 1px 2px #888;
@@ -120,18 +120,18 @@
 }
 
 .panel-chave-inner {
-  width: 8px;
-  height: 28px;
+  width: 10.4px;
+  height: 36.4px;
   background: #444;
   border-radius: 2px;
 }
 
 .panel-calha {
-  width: 100px;
-  height: 102px;
+  width: 132px;
+  height: 134px;
   background: linear-gradient(180deg, #bdbdbd 60%, #888 100%);
   border-radius: 0 0 18px 18px;
-  margin-top: -8px;
+  margin-top: -10.4px;
   box-shadow: 0 4px 10px #aaa;
   border: 2px solid #bdbdbd;
   border-top: none;
@@ -144,10 +144,10 @@
 }
 
 .motor-info {
-  margin-bottom: 0.5rem;
+  width: 220px;
   color: black;
   border: 2px solid #bdbdbd;
-  border-radius: 0.5rem;
+  border-radius: 0.2rem;
   padding: 0.5rem 1rem;
   background: #eaeaea;
 }
@@ -158,13 +158,36 @@
   object-fit: contain;
 }
 
-.motor-btn {
-  margin-top: 0.5rem;
-  padding: 0.5rem 1rem;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
+.inverter {
+  background: #eaeaea;
+  border: 2px solid #bdbdbd;
+  border-radius: 0.5rem;
+  width: 220px;
+  padding: 1rem 1rem 1rem 1rem;
+  box-shadow: 0 2px 12px #bbb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.inverter-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inverter-img {
+  width: 400px;
+
+  object-fit: cover;
+  border-radius: 0.5rem;
+}
+
+.motor-inverter-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @media (max-width: 700px) {
@@ -173,12 +196,14 @@
   }
   .planta-main-row {
     flex-direction: column;
+    align-items: center;
     gap: 2rem;
   }
   .planta-panel-container {
     margin-bottom: 1.2rem;
   }
   .planta-motors-row {
+    border: 0px solid #dd1b1b;
     flex-direction: column;
     gap: 1.2rem;
     align-items: center;
@@ -223,15 +248,19 @@
     width: 80px;
     height: 70px;
   }
+  .motor-inverter-group {
+    width: 100%;
+    border: 1px solid #bdbdbd;
+    border-radius: 0rem;
+  }
   .motor-img {
-    width: 7rem;
-    height: 7rem;
+    width: 12rem;
+    height: 12rem;
   }
   .motor-info {
     font-size: 0.95rem;
   }
-  .motor-btn {
-    font-size: 1rem;
-    padding: 0.4rem 0.7rem;
+  .motor {
+    width: 100%;
   }
 }

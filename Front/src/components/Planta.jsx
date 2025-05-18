@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { usePlantData } from "./PlantDataContext";
 import "./Planta.css";
+import fc302Image from "/assets/fc302.jpg";
+import fc202Image from "/assets/fc202.jpg";
+import cfw500Image from "/assets/cfw500.jpg";
+import fc51Image from "/assets/fc51.webp";
 
 const VoltageDisplay = ({ voltage }) => (
   <div style={{ textAlign: "center" }}>
@@ -26,6 +30,8 @@ const Motor = ({
   frequencia,
   running,
 }) => {
+  // Calcula o RPM baseado na frequência (regra de 3: 60 Hz = 1790 RPM)
+  const rpm = ((frequencia || 0) * 1790) / 60;
   return (
     <div className="motor">
       <div className="motor-info">
@@ -35,7 +41,7 @@ const Motor = ({
         <div>Temperatura: {temperatura}°C</div>
         <div>Vibração: {vibracao} mm/s</div>
         <div>Corrente: {corrente} A</div>
-        <div>Frequência: {frequencia} Hz</div>
+        <div>RPM: {rpm.toFixed(0)}</div>
       </div>
       <img
         src={running ? "images/motor-spinning.gif" : "images/motor-stoped.png"}
@@ -45,6 +51,37 @@ const Motor = ({
     </div>
   );
 };
+
+const getImageForInverter = (model) => {
+  const images = {
+    fc302: fc302Image,
+    fc202: fc202Image,
+    cfw500: cfw500Image,
+    fc51: fc51Image,
+  };
+  return (
+    images[model] ||
+    "https://res.cloudinary.com/rsc/image/upload/b_rgb:FFFFFF,c_pad,dpr_2.625,f_auto,h_214,q_auto,w_380/c_pad,h_214,w_380/R8918833-01?pgw=1"
+  );
+};
+
+const Inverter = ({ nome, temperatura, frequencia, status, model }) => (
+  <div className="inverter-info">
+    <img
+      src={getImageForInverter(model)}
+      alt="Inversor"
+      className="inverter-img"
+    />
+    <div className="motor-info">
+      <div>
+        <strong>{nome || "Inversor"}</strong>
+      </div>
+      <div>Temperatura: {temperatura} ºC</div>
+      <div>Frequência: {frequencia} Hz</div>
+      <div>Status: {status}</div>
+    </div>
+  </div>
+);
 
 const Panel = () => {
   const data = usePlantData();
@@ -148,16 +185,44 @@ const HomePage = () => {
                           .toLowerCase() === "em operacao"
                     )
                   : false;
+              // Troca para 'Ready' se status for 'Controle pronto'
+              const inverterStatus = running
+                ? "Run"
+                : inverter.interpretedStatus &&
+                  inverter.interpretedStatus.length > 0
+                ? inverter.interpretedStatus[0]
+                : "Desconhecido";
+              const showStatus =
+                inverterStatus &&
+                inverterStatus
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+                  .toLowerCase() === "controle pronto"
+                  ? "Ready"
+                  : inverterStatus;
               return (
-                <Motor
+                <div
                   key={motor.address || idx}
-                  nome={motor.name || `Motor ${idx + 1}`}
-                  temperatura={motor.temperature / 10}
-                  vibracao={motor.vibration_x}
-                  corrente={inverter.current || 0}
-                  frequencia={inverter ? inverter.frequency : 0}
-                  running={running}
-                />
+                  className="motor-inverter-group"
+                >
+                  {inverter && (
+                    <Inverter
+                      nome={inverter.name || `Inversor ${inverter.address}`}
+                      temperatura={inverter.temperature || 0}
+                      frequencia={inverter.frequency || 0}
+                      status={showStatus}
+                      model={inverter.model}
+                    />
+                  )}
+                  <Motor
+                    nome={motor.name || `Motor ${idx + 1}`}
+                    temperatura={motor.temperature / 10}
+                    vibracao={motor.vibration_x}
+                    corrente={inverter ? inverter.current : 0}
+                    RPM={inverter ? inverter.frequency : 0}
+                    running={running}
+                  />
+                </div>
               );
             })
           ) : (

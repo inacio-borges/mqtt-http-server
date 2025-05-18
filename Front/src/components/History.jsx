@@ -195,22 +195,34 @@ function HistoricoGrafico() {
 
   // Plugin para forçar fundo branco no canvas do Chart.js
   const whiteBgPlugin = {
-    id: 'customWhiteBackground',
+    id: "customWhiteBackground",
     beforeDraw: (chart, args, options) => {
       const { ctx, chartArea } = chart;
       if (!chartArea) return;
       ctx.save();
-      ctx.globalCompositeOperation = 'destination-over';
-      ctx.fillStyle = '#fff';
-      ctx.fillRect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(
+        chartArea.left,
+        chartArea.top,
+        chartArea.right - chartArea.left,
+        chartArea.bottom - chartArea.top
+      );
       ctx.restore();
     },
   };
 
   const chartOptions = {
     responsive: true,
+    interaction: {
+      mode: "nearest",
+      intersect: false,
+    },
     plugins: {
-      legend: { display: true, labels: { color: "#222", font: { weight: "bold" } } },
+      legend: {
+        display: true,
+        labels: { color: "#222", font: { weight: "bold" } },
+      },
       title: {
         display: true,
         text: "Histórico da Variável",
@@ -223,6 +235,11 @@ function HistoricoGrafico() {
         bodyColor: "#222",
         borderColor: "#bbb",
         borderWidth: 1,
+        callbacks: {
+          label: function (context) {
+            return `${context.dataset.label}: ${context.parsed.y}`;
+          },
+        },
       },
       customWhiteBackground: whiteBgPlugin,
     },
@@ -236,20 +253,14 @@ function HistoricoGrafico() {
         title: { display: true, text: "Valor", color: "#222" },
         ticks: { color: "#222" },
         grid: { color: "#eee" },
-        // Ajuste automático da escala com margem de 10%
-        beginAtZero: false,
-        suggestedMin: (() => {
-          if (data.length === 0) return 0;
-          const min = Math.min(...data.map((d) => d.value));
-          const max = Math.max(...data.map((d) => d.value));
-          const margin = (max - min) * 0.5;
-          return min - margin;
-        })(),
+
+        beginAtZero: true,
+
         suggestedMax: (() => {
           if (data.length === 0) return 1;
           const min = Math.min(...data.map((d) => d.value));
           const max = Math.max(...data.map((d) => d.value));
-          const margin = (max - min) * 0.5;
+          const margin = (max - min) * 0.8;
           return max + margin;
         })(),
       },
@@ -263,19 +274,50 @@ function HistoricoGrafico() {
     <div
       className="history-container"
       style={{
-        maxWidth: "98vw",
-        minHeight: 700,
-        width: "100%",
-        margin: "0 auto",
+        maxWidth: "85vw",
+        minHeight: window.innerWidth < 600 ? 400 : 700,
+        width: "100vw",
+        margin: 0,
+        padding: window.innerWidth < 600 ? 4 : 24,
+        borderRadius: window.innerWidth < 600 ? 8 : 18,
+        boxSizing: "border-box",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
       }}
     >
-      <h1>Gráfico de Variáveis</h1>
-      <div style={{ marginBottom: 16 }}>
-        <label htmlFor="var-select">Selecione a variável: </label>
+      <h1
+        style={{
+          fontSize: window.innerWidth < 600 ? 18 : 32,
+          textAlign: "center",
+          margin: window.innerWidth < 600 ? "8px 0" : "24px 0",
+        }}
+      >
+        Gráfico de Variáveis
+      </h1>
+      <div
+        style={{
+          marginBottom: 16,
+          width: window.innerWidth < 600 ? "100%" : "auto",
+          textAlign: "center",
+        }}
+      >
+        <label
+          htmlFor="var-select"
+          style={{ fontSize: window.innerWidth < 600 ? 12 : 16 }}
+        >
+          Selecione a variável:{" "}
+        </label>
         <select
           id="var-select"
           value={selectedVar}
           onChange={(e) => setSelectedVar(e.target.value)}
+          style={{
+            fontSize: window.innerWidth < 600 ? 12 : 16,
+            width: window.innerWidth < 600 ? "90%" : "auto",
+            marginTop: window.innerWidth < 600 ? 4 : 0,
+          }}
         >
           {variableOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -284,8 +326,81 @@ function HistoricoGrafico() {
           ))}
         </select>
       </div>
-      <div className="chart-modern" style={{ minHeight: 600, width: "95%", background: '#fff', borderRadius: 16, boxShadow: '0 2px 16px #0001' }}>
-        <Line data={chartData} options={chartOptions} plugins={[whiteBgPlugin]} />
+      <div
+        className="chart-modern"
+        style={{
+          minHeight: window.innerWidth < 600 ? 280 : 400,
+          width: "100%",
+          maxWidth: "100vw",
+          background: "#fff",
+          borderRadius: window.innerWidth < 600 ? 8 : 16,
+          boxShadow: "0 2px 16px #0001",
+          overflowX: "auto",
+          padding: window.innerWidth < 600 ? 2 : 24,
+          boxSizing: "border-box",
+        }}
+      >
+        <Line
+          data={chartData}
+          options={{
+            ...chartOptions,
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+              ...chartOptions.plugins,
+              legend: {
+                ...chartOptions.plugins.legend,
+                labels: {
+                  ...chartOptions.plugins.legend.labels,
+                  font: {
+                    size: window.innerWidth < 600 ? 12 : 16,
+                    weight: "bold",
+                  },
+                },
+              },
+              title: {
+                ...chartOptions.plugins.title,
+                font: {
+                  size: window.innerWidth < 600 ? 16 : 26,
+                  weight: "bold",
+                },
+              },
+            },
+            layout: {
+              padding: window.innerWidth < 600 ? 4 : 24,
+            },
+            scales: {
+              x: {
+                ...chartOptions.scales.x,
+                ticks: {
+                  ...chartOptions.scales.x.ticks,
+                  font: { size: window.innerWidth < 600 ? 10 : 14 },
+                  maxRotation: 45,
+                  minRotation: 0,
+                  autoSkip: true,
+                  maxTicksLimit: window.innerWidth < 600 ? 4 : 10,
+                },
+                title: {
+                  ...chartOptions.scales.x.title,
+                  font: { size: window.innerWidth < 600 ? 10 : 14 },
+                },
+              },
+              y: {
+                ...chartOptions.scales.y,
+                ticks: {
+                  ...chartOptions.scales.y.ticks,
+                  font: { size: window.innerWidth < 600 ? 10 : 14 },
+                },
+                title: {
+                  ...chartOptions.scales.y.title,
+                  font: { size: window.innerWidth < 600 ? 10 : 14 },
+                },
+              },
+            },
+          }}
+          plugins={[whiteBgPlugin]}
+          height={window.innerWidth < 600 ? 160 : 600}
+        />
       </div>
     </div>
   );
