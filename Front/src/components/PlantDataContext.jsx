@@ -7,12 +7,12 @@ function convertPlantData(rawData) {
   // Fatores de conversão para cada campo (edite conforme necessário)
   const conversionFactors = {
     // Campos principais
-    current_r: 0.1, // exemplo: valor inteiro * 0.1
-    current_s: 0.1,
-    current_t: 0.1,
-    voltage_r: 0.1,
-    voltage_s: 0.1,
-    voltage_t: 0.1,
+    current_r: 1, // exemplo: valor inteiro * 0.1
+    current_s: 1,
+    current_t: 1,
+    voltage_r: 1,
+    voltage_s: 1,
+    voltage_t: 1,
     // Adicione outros campos principais aqui
   };
   // Fatores para campos de inverters
@@ -42,7 +42,8 @@ function convertPlantData(rawData) {
   // Converte campos principais
   Object.keys(conversionFactors).forEach((key) => {
     if (converted[key] !== undefined && converted[key] !== null) {
-      converted[key] = Math.round(converted[key] * conversionFactors[key] * 10) / 10;
+      converted[key] =
+        Math.round(converted[key] * conversionFactors[key] * 10) / 10;
     }
   });
   // Converte campos dos inverters
@@ -51,7 +52,8 @@ function convertPlantData(rawData) {
       const newInv = { ...inv };
       Object.keys(inverterFactors).forEach((key) => {
         if (newInv[key] !== undefined && newInv[key] !== null) {
-          newInv[key] = Math.round(newInv[key] * inverterFactors[key] * 10) / 10;
+          newInv[key] =
+            Math.round(newInv[key] * inverterFactors[key] * 10) / 10;
         }
       });
       return newInv;
@@ -63,7 +65,8 @@ function convertPlantData(rawData) {
       const newMotor = { ...motor };
       Object.keys(motorFactors).forEach((key) => {
         if (newMotor[key] !== undefined && newMotor[key] !== null) {
-          newMotor[key] = Math.round(newMotor[key] * motorFactors[key] * 10) / 10;
+          newMotor[key] =
+            Math.round(newMotor[key] * motorFactors[key] * 10) / 10;
         }
       });
       return newMotor;
@@ -84,7 +87,7 @@ export function PlantDataProvider({ children }) {
         if (isPreview) {
           baseUrl = "http://192.168.62.80:3000";
         } else if (isDev) {
-          baseUrl = "http://192.168.62.80:3000";
+          baseUrl = "http://localhost:3000";
         }
         // Busca dados do plant
         const plantResponse = await fetch(`${baseUrl}/api/plant`);

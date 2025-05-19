@@ -23,7 +23,7 @@
   align-items: space-between;
   justify-content: space-between;
   justify-content: center;
-  gap: 2rem;
+
   min-width: 1300px;
   text-align: center;
 }
@@ -68,8 +68,9 @@
   border: 2px solid #ccc;
   padding: 10px;
   border-radius: 10px;
+  box-sizing: border-box;
   background: #eaeaea;
-  width: 90%;
+  width: 80%;
 }
 .sensors {
   display: flex;

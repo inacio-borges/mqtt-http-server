@@ -121,28 +121,31 @@ function RealTime() {
                       {/* Conteúdo do motor */}
                       <div className="inverter-details" key={idx}>
                         <h5>
-                          {motor.name} (Endereço: {motor.address})
+                          {motor.name}_{motor.address}
                         </h5>
                         <p>
-                          <strong>Temperatura:</strong> {(motor.temperature)} °C
+                          <strong>Temp:</strong> {motor.temperature} °C
                         </p>
                         <p>
-                          <strong>Vibração X:</strong> {(motor.vibration_x)} mm/s
+                          <strong>VibX:</strong> {motor.vibration_x} mm/s
                         </p>
                         <p>
-                          <strong>Vibração Y:</strong> {(motor.vibration_y)} mm/s
+                          <strong>VibY:</strong> {motor.vibration_y} mm/s
                         </p>
                         <p>
-                          <strong>Vibração Z: </strong> {(motor.vibration_z)} mm/s
+                          <strong>VibZ: </strong> {motor.vibration_z} mm/s
                         </p>
                         <p>
-                          <strong>Deslocamento X: </strong>{(motor.displacement_x)}mm
+                          <strong>DeslocX: </strong>
+                          {motor.displacement_x} mm
                         </p>
                         <p>
-                          <strong>Deslocamento Y: </strong>{(motor.displacement_y)}mm/s
+                          <strong>DeslocY: </strong>
+                          {motor.displacement_y} mm
                         </p>
                         <p>
-                          <strong>Deslocamento Z: </strong>{(motor.displacement_z)}mm/s
+                          <strong>DeslocZ: </strong>
+                          {motor.displacement_z} mm
                         </p>
                       </div>
                     </div>
@@ -157,8 +160,7 @@ function RealTime() {
                   src={getImageForInverter(item.model)}
                   alt={`Inversor ${item.id}`}
                   style={{
-                    width: "100px",
-                    height: "150px",
+                    width: "80px",
                     objectFit: "cover",
                     marginBottom: "10px",
                     borderRadius: "5px",

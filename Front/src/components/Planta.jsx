@@ -6,52 +6,6 @@ import fc202Image from "/assets/fc202.jpg";
 import cfw500Image from "/assets/cfw500.jpg";
 import fc51Image from "/assets/fc51.png";
 
-const VoltageDisplay = ({ voltage }) => (
-  <div style={{ textAlign: "center" }}>
-    <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-      {voltage.toFixed(1)} V
-    </div>
-  </div>
-);
-
-const CurrentDisplay = ({ current }) => (
-  <div style={{ textAlign: "center" }}>
-    <div style={{ fontSize: "1.5rem", fontWeight: "bold" }}>
-      {current.toFixed(1)} A
-    </div>
-  </div>
-);
-
-const Motor = ({
-  nome,
-  temperatura,
-  vibracao,
-  corrente,
-  frequencia,
-  running,
-}) => {
-  // Calcula o RPM baseado na frequência (regra de 3: 60 Hz = 1790 RPM)
-  const rpm = ((frequencia || 0) * 1790) / 60;
-  return (
-    <div className="motor">
-      <div className="motor-info">
-        <div>
-          <strong>{nome || "Motor"}</strong>
-        </div>
-        <div>Temperatura: {temperatura}°C</div>
-        <div>Vibração: {vibracao} mm/s</div>
-        <div>Corrente: {corrente} A</div>
-        <div>RPM: {rpm.toFixed(0)}</div>
-      </div>
-      <img
-        src={running ? "images/motor-spinning.gif" : "images/motor-stoped.png"}
-        alt="Motor"
-        className="motor-img"
-      />
-    </div>
-  );
-};
-
 const getImageForInverter = (model) => {
   const images = {
     fc302: fc302Image,
@@ -62,45 +16,6 @@ const getImageForInverter = (model) => {
   return (
     images[model] ||
     "https://res.cloudinary.com/rsc/image/upload/b_rgb:FFFFFF,c_pad,dpr_2.625,f_auto,h_214,q_auto,w_380/c_pad,h_214,w_380/R8918833-01?pgw=1"
-  );
-};
-
-const Inverter = ({ nome, temperatura, frequencia, status, model }) => {
-  // Define a classe baseada no status
-  let statusClass = "motor-info";
-  if (status) {
-    const statusNorm = status.toString().toLowerCase();
-    if (statusNorm === "run" || statusNorm === "em operação") {
-      statusClass += " motor-info-run";
-    } else if (
-      statusNorm.includes("falha") ||
-      statusNorm.includes("erro") ||
-      statusNorm === "fault"
-    ) {
-      statusClass += " motor-info-fault";
-    } else if (
-      statusNorm.includes("alarme") ||
-      statusNorm === "alarm"
-    ) {
-      statusClass += " motor-info-alarm";
-    }
-  }
-  return (
-    <div className="inverter-info">
-      <img
-        src={getImageForInverter(model)}
-        alt="Inversor"
-        className="inverter-img"
-      />
-      <div className={statusClass}>
-        <div>
-          <strong>{nome || "Inversor"}</strong>
-        </div>
-        <div>Temperatura: {temperatura} ºC</div>
-        <div>Frequência: {frequencia} Hz</div>
-        <div>Status: {status}</div>
-      </div>
-    </div>
   );
 };
 
@@ -154,7 +69,6 @@ const Panel = () => {
         </div>
       </div>
       {/* Calha visual */}
-      
     </div>
   );
 };
@@ -224,7 +138,10 @@ const HomePage = () => {
                     const status = showStatus;
                     if (status) {
                       const statusNorm = status.toString().toLowerCase();
-                      if (statusNorm === "run" || statusNorm === "em operação") {
+                      if (
+                        statusNorm === "run" ||
+                        statusNorm === "em operação"
+                      ) {
                         statusClass += " motor-info-run";
                       } else if (
                         statusNorm.includes("falha") ||
@@ -244,35 +161,77 @@ const HomePage = () => {
                 >
                   {inverter && (
                     <div className="inverter-info">
-                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "1rem",
+                        }}
+                      >
                         <img
                           src={getImageForInverter(inverter.model)}
                           alt="Inversor"
                           className="inverter-img"
                         />
                         <img
-                          src={running ? "images/motor-spinning.gif" : "images/motor-stoped.png"}
+                          src={
+                            running
+                              ? "images/motor-spinning.gif"
+                              : "images/motor-stoped.png"
+                          }
                           alt="Motor"
                           className="motor-img"
                         />
                       </div>
                       <div className="motor-info">
                         <div className="inverter-info-text">
-                          <div><strong>{inverter.model.toUpperCase()}</strong></div>
-                          <div>Temp: <strong>{inverter.temperature || 0} ºC</strong></div>
-                          <div>Ref: <strong>{inverter.frequency || 0} Hz</strong></div>
-                          <div>Freq: <strong>{inverter.frequency || 0} Hz</strong></div>
-                          <div>Stats: <strong>{showStatus}</strong></div>
-                          <div><br /></div>
+                          <div>
+                            <strong>{inverter.model.toUpperCase()}</strong>
+                          </div>
+                          <div>
+                            Temp:{" "}
+                            <strong>{inverter.temperature || 0} ºC</strong>
+                          </div>
+                          <div>
+                            Ref: <strong>{inverter.frequency || 0} Hz</strong>
+                          </div>
+                          <div>
+                            Freq: <strong>{inverter.frequency || 0} Hz</strong>
+                          </div>
+                          <div>
+                            Stats: <strong>{showStatus}</strong>
+                          </div>
+                          <div>
+                            <br />
+                          </div>
                         </div>
                         <div className="motor-info-text">
                           <div>
                             <strong>{motor.name || `Motor ${idx + 1}`}</strong>
                           </div>
-                          <div>Temp: <strong>{motor.temperature / 10}°C</strong></div>
-                          <div>Vibração: <strong>{motor.vibration_x} mm/s</strong></div>
-                          <div>Corrente: <strong>{inverter ? inverter.current : 0} A</strong></div>
-                          <div>RPM: <strong>{inverter ? (((inverter.frequency || 0) * 1790) / 60).toFixed(0) : 0}</strong></div>
+                          <div>
+                            Temp: <strong>{motor.temperature}°C</strong>
+                          </div>
+                          <div>
+                            Vibração: <strong>{motor.vibration_x} mm/s</strong>
+                          </div>
+                          <div>
+                            Corrente:{" "}
+                            <strong>{inverter ? inverter.current : 0} A</strong>
+                          </div>
+                          <div>
+                            RPM:{" "}
+                            <strong>
+                              {inverter
+                                ? (
+                                    ((inverter.frequency || 0) * 1790) /
+                                    60
+                                  ).toFixed(0)
+                                : 0}
+                            </strong>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -282,10 +241,19 @@ const HomePage = () => {
                       <div>
                         <strong>{motor.name || `Motor ${idx + 1}`}</strong>
                       </div>
-                      <div>Temperatura Motor: <strong>{motor.temperature / 10}°C</strong></div>
-                      <div>Vibração: <strong>{motor.vibration_x} mm/s</strong></div>
-                      <div>Corrente: <strong>0 A</strong></div>
-                      <div>RPM: <strong>0</strong></div>
+                      <div>
+                        Temperatura Motor:{" "}
+                        <strong>{motor.temperature / 10}°C</strong>
+                      </div>
+                      <div>
+                        Vibração: <strong>{motor.vibration_x} mm/s</strong>
+                      </div>
+                      <div>
+                        Corrente: <strong>0 A</strong>
+                      </div>
+                      <div>
+                        RPM: <strong>0</strong>
+                      </div>
                     </div>
                   )}
                 </div>
