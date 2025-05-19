@@ -4,7 +4,7 @@ import "./Planta.css";
 import fc302Image from "/assets/fc302.jpg";
 import fc202Image from "/assets/fc202.jpg";
 import cfw500Image from "/assets/cfw500.jpg";
-import fc51Image from "/assets/fc51.webp";
+import fc51Image from "/assets/fc51.png";
 
 const VoltageDisplay = ({ voltage }) => (
   <div style={{ textAlign: "center" }}>
@@ -65,23 +65,44 @@ const getImageForInverter = (model) => {
   );
 };
 
-const Inverter = ({ nome, temperatura, frequencia, status, model }) => (
-  <div className="inverter-info">
-    <img
-      src={getImageForInverter(model)}
-      alt="Inversor"
-      className="inverter-img"
-    />
-    <div className="motor-info">
-      <div>
-        <strong>{nome || "Inversor"}</strong>
+const Inverter = ({ nome, temperatura, frequencia, status, model }) => {
+  // Define a classe baseada no status
+  let statusClass = "motor-info";
+  if (status) {
+    const statusNorm = status.toString().toLowerCase();
+    if (statusNorm === "run" || statusNorm === "em operação") {
+      statusClass += " motor-info-run";
+    } else if (
+      statusNorm.includes("falha") ||
+      statusNorm.includes("erro") ||
+      statusNorm === "fault"
+    ) {
+      statusClass += " motor-info-fault";
+    } else if (
+      statusNorm.includes("alarme") ||
+      statusNorm === "alarm"
+    ) {
+      statusClass += " motor-info-alarm";
+    }
+  }
+  return (
+    <div className="inverter-info">
+      <img
+        src={getImageForInverter(model)}
+        alt="Inversor"
+        className="inverter-img"
+      />
+      <div className={statusClass}>
+        <div>
+          <strong>{nome || "Inversor"}</strong>
+        </div>
+        <div>Temperatura: {temperatura} ºC</div>
+        <div>Frequência: {frequencia} Hz</div>
+        <div>Status: {status}</div>
       </div>
-      <div>Temperatura: {temperatura} ºC</div>
-      <div>Frequência: {frequencia} Hz</div>
-      <div>Status: {status}</div>
     </div>
-  </div>
-);
+  );
+};
 
 const Panel = () => {
   const data = usePlantData();
@@ -133,17 +154,13 @@ const Panel = () => {
         </div>
       </div>
       {/* Calha visual */}
-      <div className="panel-calha"></div>
+      
     </div>
   );
 };
 
 const HomePage = () => {
   const data = usePlantData();
-
-  // Parâmetro de ligação: mapeamento entre address do motor e do inversor
-  // Exemplo: motor com address 200 está ligado ao inversor address 10
-  // Ajuste conforme necessário
   const motorToInverterAddress = {
     200: 10, // Motor 1 -> Inversor 10
     201: 10, // Motor 2 -> Inversor 11 (exemplo, ajuste conforme seu sistema)
@@ -173,7 +190,6 @@ const HomePage = () => {
                   `Motor address: ${motor.address}, Inverter não encontrado!`
                 );
               }
-              // Considera rodando se interpretedStatus contém exatamente "Em operação" (não "Sem operação")
               const running =
                 inverter && Array.isArray(inverter.interpretedStatus)
                   ? inverter.interpretedStatus.some(
@@ -203,25 +219,75 @@ const HomePage = () => {
               return (
                 <div
                   key={motor.address || idx}
-                  className="motor-inverter-group"
+                  className={(() => {
+                    let statusClass = "motor-inverter-group";
+                    const status = showStatus;
+                    if (status) {
+                      const statusNorm = status.toString().toLowerCase();
+                      if (statusNorm === "run" || statusNorm === "em operação") {
+                        statusClass += " motor-info-run";
+                      } else if (
+                        statusNorm.includes("falha") ||
+                        statusNorm.includes("erro") ||
+                        statusNorm === "fault"
+                      ) {
+                        statusClass += " motor-info-fault";
+                      } else if (
+                        statusNorm.includes("alarme") ||
+                        statusNorm === "alarm"
+                      ) {
+                        statusClass += " motor-info-alarm";
+                      }
+                    }
+                    return statusClass;
+                  })()}
                 >
                   {inverter && (
-                    <Inverter
-                      nome={inverter.name || `Inversor ${inverter.address}`}
-                      temperatura={inverter.temperature || 0}
-                      frequencia={inverter.frequency || 0}
-                      status={showStatus}
-                      model={inverter.model}
-                    />
+                    <div className="inverter-info">
+                      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+                        <img
+                          src={getImageForInverter(inverter.model)}
+                          alt="Inversor"
+                          className="inverter-img"
+                        />
+                        <img
+                          src={running ? "images/motor-spinning.gif" : "images/motor-stoped.png"}
+                          alt="Motor"
+                          className="motor-img"
+                        />
+                      </div>
+                      <div className="motor-info">
+                        <div className="inverter-info-text">
+                          <div><strong>{inverter.model.toUpperCase()}</strong></div>
+                          <div>Temp: <strong>{inverter.temperature || 0} ºC</strong></div>
+                          <div>Ref: <strong>{inverter.frequency || 0} Hz</strong></div>
+                          <div>Freq: <strong>{inverter.frequency || 0} Hz</strong></div>
+                          <div>Stats: <strong>{showStatus}</strong></div>
+                          <div><br /></div>
+                        </div>
+                        <div className="motor-info-text">
+                          <div>
+                            <strong>{motor.name || `Motor ${idx + 1}`}</strong>
+                          </div>
+                          <div>Temp: <strong>{motor.temperature / 10}°C</strong></div>
+                          <div>Vibração: <strong>{motor.vibration_x} mm/s</strong></div>
+                          <div>Corrente: <strong>{inverter ? inverter.current : 0} A</strong></div>
+                          <div>RPM: <strong>{inverter ? (((inverter.frequency || 0) * 1790) / 60).toFixed(0) : 0}</strong></div>
+                        </div>
+                      </div>
+                    </div>
                   )}
-                  <Motor
-                    nome={motor.name || `Motor ${idx + 1}`}
-                    temperatura={motor.temperature / 10}
-                    vibracao={motor.vibration_x}
-                    corrente={inverter ? inverter.current : 0}
-                    RPM={inverter ? inverter.frequency : 0}
-                    running={running}
-                  />
+                  {!inverter && (
+                    <div className="motor-info">
+                      <div>
+                        <strong>{motor.name || `Motor ${idx + 1}`}</strong>
+                      </div>
+                      <div>Temperatura Motor: <strong>{motor.temperature / 10}°C</strong></div>
+                      <div>Vibração: <strong>{motor.vibration_x} mm/s</strong></div>
+                      <div>Corrente: <strong>0 A</strong></div>
+                      <div>RPM: <strong>0</strong></div>
+                    </div>
+                  )}
                 </div>
               );
             })

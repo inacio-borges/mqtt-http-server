@@ -14,7 +14,7 @@ export function PlantDataProvider({ children }) {
         if (isPreview) {
           baseUrl = "http://192.168.62.80:3000";
         } else if (isDev) {
-          baseUrl = "http://localhost:3000";
+          baseUrl = "http://192.168.62.80:3000";
         }
         // Busca dados do plant
         const plantResponse = await fetch(`${baseUrl}/api/plant`);

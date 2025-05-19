@@ -4,7 +4,7 @@ import fc302Image from "/assets/fc302.jpg";
 import fc202Image from "/assets/fc202.jpg";
 import cfw500Image from "/assets/cfw500.jpg";
 import qgbtImage from "/assets/qgbt.avif";
-import fc51Image from "/assets/fc51.webp"; // Adicione a imagem se existir
+import fc51Image from "/assets/fc51.png"; // Adicione a imagem se existir
 import "./RealTime.css";
 
 function RealTime() {
@@ -82,7 +82,7 @@ function RealTime() {
                 // Mapeamento entre address do motor e do inversor (ajuste conforme necessário)
                 const motorToInverterAddress = {
                   200: 10, // Motor 1 -> Inversor 10
-                  201: 10, // Motor 2 -> Inversor 11 (exemplo, ajuste conforme seu sistema)
+                  201: 10, // Motor 2 -> Inversor 10 (exemplo, ajuste conforme seu sistema)
                 };
                 const inverterAddress = motorToInverterAddress[motor.address];
                 const inverter =
