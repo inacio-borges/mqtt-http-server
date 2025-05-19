@@ -2,6 +2,76 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const PlantDataContext = createContext();
 
+// Função utilitária para conversão dos valores recebidos do tópico
+function convertPlantData(rawData) {
+  // Fatores de conversão para cada campo (edite conforme necessário)
+  const conversionFactors = {
+    // Campos principais
+    current_r: 0.1, // exemplo: valor inteiro * 0.1
+    current_s: 0.1,
+    current_t: 0.1,
+    voltage_r: 0.1,
+    voltage_s: 0.1,
+    voltage_t: 0.1,
+    // Adicione outros campos principais aqui
+  };
+  // Fatores para campos de inverters
+  const inverterFactors = {
+    frequency: 0.01, // exemplo
+    voltage: 0.1,
+    DcVoltage: 0.1,
+    power: 0.1,
+    rpm: 1,
+    temperature: 0.1,
+    current: 0.01,
+    // Adicione outros campos de inverter aqui
+  };
+  // Fatores para campos de motors
+  const motorFactors = {
+    temperature: 0.1,
+    vibration_x: 0.1,
+    vibration_y: 0.1,
+    vibration_z: 0.1,
+    displacement_x: 0.1,
+    displacement_y: 0.1,
+    displacement_z: 0.1,
+    // Adicione outros campos de motor aqui
+  };
+
+  const converted = { ...rawData };
+  // Converte campos principais
+  Object.keys(conversionFactors).forEach((key) => {
+    if (converted[key] !== undefined && converted[key] !== null) {
+      converted[key] = Math.round(converted[key] * conversionFactors[key] * 10) / 10;
+    }
+  });
+  // Converte campos dos inverters
+  if (Array.isArray(converted.inverters)) {
+    converted.inverters = converted.inverters.map((inv) => {
+      const newInv = { ...inv };
+      Object.keys(inverterFactors).forEach((key) => {
+        if (newInv[key] !== undefined && newInv[key] !== null) {
+          newInv[key] = Math.round(newInv[key] * inverterFactors[key] * 10) / 10;
+        }
+      });
+      return newInv;
+    });
+  }
+  // Converte campos dos motors
+  if (Array.isArray(converted.motors)) {
+    converted.motors = converted.motors.map((motor) => {
+      const newMotor = { ...motor };
+      Object.keys(motorFactors).forEach((key) => {
+        if (newMotor[key] !== undefined && newMotor[key] !== null) {
+          newMotor[key] = Math.round(newMotor[key] * motorFactors[key] * 10) / 10;
+        }
+      });
+      return newMotor;
+    });
+  }
+  return converted;
+}
+
 export function PlantDataProvider({ children }) {
   const [data, setData] = useState({ sensors: {}, inverters: [] });
 
@@ -33,7 +103,9 @@ export function PlantDataProvider({ children }) {
               : inv.interpretedStatus,
           };
         });
-        setData({ ...plantResult, inverters: invertersWithStatus });
+        // Converte os dados recebidos usando a função utilitária
+        const convertedPlant = convertPlantData(plantResult);
+        setData({ ...convertedPlant, inverters: invertersWithStatus });
       } catch (error) {
         console.error("Error fetching data:", error);
       }

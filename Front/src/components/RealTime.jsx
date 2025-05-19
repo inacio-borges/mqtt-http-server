@@ -124,29 +124,25 @@ function RealTime() {
                           {motor.name} (Endereço: {motor.address})
                         </h5>
                         <p>
-                          <strong>Temperatura:</strong> {motor.temperature / 10}{" "}
-                          °C
+                          <strong>Temperatura:</strong> {(motor.temperature)} °C
                         </p>
                         <p>
-                          <strong>Vibração X:</strong> {motor.vibration_x}
+                          <strong>Vibração X:</strong> {(motor.vibration_x)} mm/s
                         </p>
                         <p>
-                          <strong>Vibração Y:</strong> {motor.vibration_y}
+                          <strong>Vibração Y:</strong> {(motor.vibration_y)} mm/s
                         </p>
                         <p>
-                          <strong>Vibração Z:</strong> {motor.vibration_z}
+                          <strong>Vibração Z: </strong> {(motor.vibration_z)} mm/s
                         </p>
                         <p>
-                          <strong>Deslocamento X:</strong>{" "}
-                          {motor.displacement_x}
+                          <strong>Deslocamento X: </strong>{(motor.displacement_x)}mm
                         </p>
                         <p>
-                          <strong>Deslocamento Y:</strong>{" "}
-                          {motor.displacement_y}
+                          <strong>Deslocamento Y: </strong>{(motor.displacement_y)}mm/s
                         </p>
                         <p>
-                          <strong>Deslocamento Z:</strong>{" "}
-                          {motor.displacement_z}
+                          <strong>Deslocamento Z: </strong>{(motor.displacement_z)}mm/s
                         </p>
                       </div>
                     </div>
