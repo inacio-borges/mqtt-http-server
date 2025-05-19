@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import "./App.css";
 
 import History from "./components/History";
 import RealTime from "./components/RealTime";
@@ -8,15 +9,7 @@ import Planta from "./components/Planta";
 function App() {
   return (
     <Router>
-      <div
-        style={{
-          padding: "2rem",
-          backgroundColor: "#f9fafb",
-          border: "3px solid #ccc",
-          borderRadius: "0.5rem",
-          margin: "2rem",
-        }}
-      >
+      <div className="main-container">
         <nav
           style={{
             marginTop: "1rem",

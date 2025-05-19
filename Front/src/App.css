@@ -5,6 +5,19 @@
   text-align: center;
 }
 
+.main-container {
+  background-color: #f9fafb;
+  border: 3px solid #ccc;
+  border-radius: 0.5rem;
+  min-height: 35rem;
+  min-width: 20rem;
+  justify-content: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -40,4 +53,3 @@
 .read-the-docs {
   color: #888;
 }
-

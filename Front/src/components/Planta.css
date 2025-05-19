@@ -228,16 +228,19 @@
 
 @media (max-width: 700px) {
   #root {
-  max-width: 500px;
+  overflow: auto;
+  box-sizing: border-box;
+  max-width: 200rem;
   text-align: center;
-  margin-left: 5rem;
+  margin-left: 1hem;
 }
   .planta-root {
     padding: 1rem 0.2rem;
+    overflow: auto;
   }
   .planta-main-row {
     flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     gap: 2rem;
   }
   .planta-panel-container {
@@ -252,9 +255,9 @@
   }
   .panel,
   .motor-inverter-group {
-    
-    width: 85vw;
-    max-width: 90vw;
+    box-sizing: border-box;
+    width: 5rem;
+    max-width: 10rem;
     padding: 1.2rem 0.5rem 1rem 0.5rem;
   }
   .panel-fases {

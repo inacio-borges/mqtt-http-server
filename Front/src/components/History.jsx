@@ -181,8 +181,7 @@ function HistoricoGrafico() {
         data: data.map((d) => d.value),
         borderColor: "rgb(0 0 255)", // azul principal
         borderWidth: 3,
-        backgroundColor: "rgb(0 0 255)", // azul claro com transparência
-        tension: 0.3,
+        backgroundColor: "rgb(0 0 255)", 
         pointRadius: 0,
         pointBackgroundColor: "#fff",
         pointBorderColor: "#3b82f6",
@@ -336,7 +335,7 @@ function HistoricoGrafico() {
           borderRadius: window.innerWidth < 600 ? 8 : 16,
           boxShadow: "0 2px 16px #0001",
           overflowX: "auto",
-          padding: window.innerWidth < 600 ? 2 : 24,
+          padding: window.innerWidth < 600 ? 20 : 24,
           boxSizing: "border-box",
         }}
       >
