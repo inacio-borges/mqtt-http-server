@@ -136,13 +136,13 @@ function RealTime() {
                           <strong>Vibração Z: </strong> {(motor.vibration_z)} mm/s
                         </p>
                         <p>
-                          <strong>Deslocamento X: </strong>{(motor.displacement_x)}mm
+                          <strong>Deslocamento X: </strong>{(motor.displacement_x)} mm
                         </p>
                         <p>
-                          <strong>Deslocamento Y: </strong>{(motor.displacement_y)}mm/s
+                          <strong>Deslocamento Y: </strong>{(motor.displacement_y)} mm
                         </p>
                         <p>
-                          <strong>Deslocamento Z: </strong>{(motor.displacement_z)}mm/s
+                          <strong>Deslocamento Z: </strong>{(motor.displacement_z)} mm
                         </p>
                       </div>
                     </div>
