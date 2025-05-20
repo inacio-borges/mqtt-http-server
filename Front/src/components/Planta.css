@@ -12,7 +12,6 @@
   flex-direction: row;
   align-items: flex-start;
   gap: 2rem;
-
 }
 
 .planta-panel-container {
@@ -32,7 +31,7 @@
 .panel,
 .motor-inverter-group {
   width: 340px;
-  height: 400px; ;
+  height: 400px;
   min-width: 340px;
   max-width: 340px;
   box-sizing: border-box;
@@ -158,26 +157,26 @@
   align-items: space-between;
   justify-content: space-between;
   width: 90%;
-  color: gr;
-  border-top:  2px solid #bdbdbd;
+
+  border-top: 2px solid #bdbdbd;
   border-radius: 0.2rem;
   padding: 0.5rem 1rem;
   font-size: 1.1rem;
 }
-.motor-info-text{
+.motor-info-text {
   text-align: left !important;
 }
-.inverter-info-text{
+.inverter-info-text {
   text-align: justify !important;
 }
 .motor-info-run {
-  background: rgb(0,255,0) !important;
+  background: rgb(0, 255, 0) !important;
 }
 .motor-info-fault {
-  background: rgb(255,0,0) !important;
+  background: rgb(255, 0, 0) !important;
 }
 .motor-info-alarm {
-  background: rgb(255,255,0) !important;
+  background: rgb(255, 255, 0) !important;
 }
 
 .motor-img {
@@ -210,7 +209,6 @@
   width: 100px;
   margin-left: 0.5rem;
   object-fit: cover;
-  
 }
 
 .motor-inverter-group {
@@ -226,14 +224,28 @@
   box-shadow: 0 2px 12px #bbb;
 }
 
+.vibration-blink {
+  animation: vibrationBlink 1s steps(1, end) infinite;
+}
+@keyframes vibrationBlink {
+  0%,
+  100% {
+    background: none;
+  }
+  50% {
+    background: #ff4949;
+    color: #ffffff;
+  }
+}
+
 @media (max-width: 700px) {
   #root {
-  overflow: auto;
-  box-sizing: border-box;
-  max-width: 200rem;
-  text-align: center;
-  margin-left: 1hem;
-}
+    overflow: auto;
+    box-sizing: border-box;
+    max-width: 200rem;
+    text-align: center;
+    margin-left: 1hem;
+  }
   .planta-root {
     padding: 1rem 0.2rem;
     overflow: auto;
@@ -245,13 +257,12 @@
   }
   .planta-panel-container {
     margin-bottom: 1.2rem;
-    
   }
   .planta-motors-row {
     border: 0px solid #dd1b1b;
     flex-direction: column;
     gap: 1.2rem;
-    align-items: center; 
+    align-items: center;
   }
   .panel,
   .motor-inverter-group {
@@ -287,7 +298,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    
   }
   .panel-chave-row {
     width: 100%;

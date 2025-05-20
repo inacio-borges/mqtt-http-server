@@ -20,14 +20,6 @@ const savePlantData = () => {
       createdAt: new Date(),
     };
     PlantModel.save(plantData);
-    console.log("Plant data saved:", plantData);
-  } else {
-    console.warn(
-      "Incomplete data. Skipping save. Sensor data:",
-      sensorData,
-      "Inverter data:",
-      inverterData
-    );
   }
 };
 
@@ -35,7 +27,6 @@ const SAVE_INTERVAL = 5000; // Intervalo em milissegundos (5 segundos por padrã
 
 const startPeriodicSave = () => {
   setInterval(() => {
-    console.log("Periodic save triggered...");
     savePlantData();
   }, SAVE_INTERVAL);
 };
@@ -45,33 +36,25 @@ startPeriodicSave();
 
 let saveTimeout;
 const debounceSavePlantData = () => {
-  console.log("Debouncing savePlantData...");
   clearTimeout(saveTimeout);
   saveTimeout = setTimeout(() => {
-    console.log("Executing savePlantData...");
     savePlantData();
-  }, 1000); // Aguarda 1 segundo antes de salvar
+  }, 100); // Aguarda 1 segundo antes de salvar
 };
 
 const handleMqttMessage = async (topic, data) => {
-  console.log(`Processing MQTT message from topic: ${topic}`);
-  console.log("Received data:", data);
-
   if (topic.includes("sensors")) {
     // Atualiza para aceitar dIn e dOut
     sensorData = { ...data.s, id: data.id };
     if (data.s.dIn) sensorData.dIn = data.s.dIn;
     if (data.s.dOut) sensorData.dOut = data.s.dOut;
-    console.log("Updated sensor data:", sensorData);
   } else if (topic.includes("inverters")) {
     const inverter = { ...data.i, id: data.id };
     updateInverterData(inverter);
-    console.log("Updated inverter data:", inverterData);
   } else if (topic.includes("motors")) {
     // Suporte a múltiplos motores por address
     if (data.m && data.m.address) {
       motorData[data.m.address] = { ...data.m, id: data.id };
-      console.log("Updated motor data:", motorData);
     }
   }
 
@@ -80,10 +63,6 @@ const handleMqttMessage = async (topic, data) => {
 };
 
 const getLatestPlantData = async () => {
-  console.log("Fetching latest plant data...");
-  console.log("Current sensor data:", sensorData);
-  console.log("Current inverter data:", inverterData);
-  // Retorna os dados agregados
   const latest = await PlantModel.getLatest();
   if (!latest) return null;
   return {
@@ -94,9 +73,6 @@ const getLatestPlantData = async () => {
 };
 
 const getInverterStatus = (address) => {
-  console.log("Fetching inverter status for address:", address);
-  console.log("Current inverter data:", inverterData);
-
   const inverter = inverterData[address];
   if (!inverter) throw new Error("Inverter not found");
   return {

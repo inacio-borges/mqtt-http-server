@@ -28,33 +28,24 @@ const client = mqtt.connect(MQTT_BROKER_URL);
 let isServiceRunningLogged = false;
 
 client.on("connect", () => {
-  console.log("Connected to MQTT broker");
-  console.log("Subscribing to topics:", MQTT_TOPICS);
   client.subscribe(MQTT_TOPICS);
   isServiceRunningLogged = false; // Reset flag on reconnect
 });
 
 client.on("reconnect", () => {
-  console.log("Reconnecting to MQTT broker...");
   isServiceRunningLogged = false; // Reset flag on reconnect
 });
 
-client.on("close", () => {
-  console.warn("MQTT connection closed.");
-});
+client.on("close", () => {});
 
 client.on("offline", () => {
-  console.warn("MQTT client is offline.");
   isServiceRunningLogged = false; // Reset flag when offline
 });
 
-client.on("error", (error) => {
-  console.error("MQTT client encountered an error:", error);
-});
+client.on("error", (error) => {});
 
 client.on("message", async (topic, message) => {
   if (!isServiceRunningLogged) {
-    console.log("MQTT service is running...");
     isServiceRunningLogged = true; // Log only once until the next reconnect or offline event
   }
 
@@ -62,11 +53,9 @@ client.on("message", async (topic, message) => {
     const data = JSON.parse(message.toString());
 
     if (topic === TOPIC_SIGN_OF_LIFE) {
-      console.log("Plant alive");
       // Logic to handle plant alive signal
     } else if (topic == TOPIC_SENSORS) {
       if (!data.s || !data.id) {
-        console.warn("Incomplete sensor data. Skipping save.", data);
         return;
       }
       const newSensorData = {
@@ -80,14 +69,14 @@ client.on("message", async (topic, message) => {
         dIn: data.s.dIn,
         dOut: data.s.dOut,
       };
-      console.log("Sensor data received:", newSensorData);
       await PlantService.handleMqttMessage(topic, {
         s: newSensorData,
         id: data.id,
       });
+      // Atualiza imediatamente após mensagem
+      await PlantService.savePlantData();
     } else if (topic === TOPIC_INVERTERS) {
       if (!data.i || !data.id) {
-        console.warn("Incomplete inverter data. Skipping save.", data);
         return;
       }
       let newInverterData;
@@ -123,17 +112,14 @@ client.on("message", async (topic, message) => {
           faultLog: data.i.flt,
         };
       }
-      console.log(
-        "Inverter data received:",
-        JSON.stringify(newInverterData, null, 2)
-      );
       await PlantService.handleMqttMessage(topic, {
         i: newInverterData,
         id: data.id,
       });
+      // Atualiza imediatamente após mensagem
+      await PlantService.savePlantData();
     } else if (topic === TOPIC_MOTORS) {
       if (!data.m || !data.id) {
-        console.warn("Incomplete motor data. Skipping save.", data);
         return;
       }
       const newMotorData = {
@@ -148,15 +134,14 @@ client.on("message", async (topic, message) => {
         displacement_y: data.m.dY,
         displacement_z: data.m.dZ,
       };
-      console.log("Motor data received:", newMotorData);
       await PlantService.handleMqttMessage(topic, {
         m: newMotorData,
         id: data.id,
       });
+      // Atualiza imediatamente após mensagem
+      await PlantService.savePlantData();
     }
-  } catch (error) {
-    console.error("Error processing MQTT message:", error);
-  }
+  } catch (error) {}
 });
 
 export default client;

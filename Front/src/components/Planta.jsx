@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { usePlantData } from "./PlantDataContext";
+import { getVibrationTotal, getVibrationRatingByClass } from "./vibrationUtils";
 import "./Planta.css";
 import fc302Image from "/assets/fc302.jpg";
 import fc202Image from "/assets/fc202.jpg";
@@ -130,6 +131,40 @@ const HomePage = () => {
                   .toLowerCase() === "controle pronto"
                   ? "Ready"
                   : inverterStatus;
+              // Cálculo do status de vibração
+              const vibTotal = getVibrationTotal(
+                motor.vibration_x,
+                motor.vibration_y,
+                motor.vibration_z
+              );
+              // Classe do motor (fixo para "I" conforme solicitado)
+              const machineClass = motor.class || "I";
+              const vibRating = getVibrationRatingByClass(
+                vibTotal,
+                machineClass
+              );
+              // Status textual para lógica de cor (normal/alerta/critico)
+              let vibStatus;
+              if (vibRating.rating === "A" || vibRating.rating === "B") {
+                vibStatus = "normal";
+              } else if (vibRating.rating === "C") {
+                vibStatus = "alerta";
+              } else if (vibRating.rating === "D") {
+                vibStatus = "critico";
+              }
+              // Alternância de cor para alerta (amarelo/verde) usando classe CSS
+              let vibClass = "";
+              if (vibStatus === "critico" || vibRating.rating === "D") {
+                vibClass = " motor-info-fault";
+              } else if (vibStatus === "alerta" || vibRating.rating === "C") {
+                vibClass = " motor-info-alarm";
+              } else if (
+                vibStatus === "normal" ||
+                vibRating.rating === "A" ||
+                vibRating.rating === "B"
+              ) {
+                vibClass = " motor-info-run";
+              }
               return (
                 <div
                   key={motor.address || idx}
@@ -156,7 +191,8 @@ const HomePage = () => {
                         statusClass += " motor-info-alarm";
                       }
                     }
-                    return statusClass;
+                    // Prioriza classe de vibração
+                    return statusClass + vibClass;
                   })()}
                 >
                   {inverter && (
@@ -203,9 +239,6 @@ const HomePage = () => {
                           <div>
                             Stats: <strong>{showStatus}</strong>
                           </div>
-                          <div>
-                            <br />
-                          </div>
                         </div>
                         <div className="motor-info-text">
                           <div>
@@ -214,8 +247,15 @@ const HomePage = () => {
                           <div>
                             Temp: <strong>{motor.temperature}°C</strong>
                           </div>
-                          <div>
-                            Vibração: <strong>{motor.vibration_x} mm/s</strong>
+                          <div
+                            className={
+                              vibStatus === "alerta" || vibStatus === "critico"
+                                ? "vibration-blink"
+                                : ""
+                            }
+                          >
+                            Vibração:{" "}
+                            <strong>{vibTotal.toFixed(2)} mm/s</strong>{" "}
                           </div>
                           <div>
                             Corrente:{" "}

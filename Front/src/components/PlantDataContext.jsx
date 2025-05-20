@@ -61,7 +61,7 @@ function convertPlantData(rawData) {
   }
   // Converte campos dos motors
   if (Array.isArray(converted.motors)) {
-    converted.motors = converted.motors.map((motor) => {
+    converted.motors = converted.motors.map((motor, idx) => {
       const newMotor = { ...motor };
       Object.keys(motorFactors).forEach((key) => {
         if (newMotor[key] !== undefined && newMotor[key] !== null) {
@@ -69,6 +69,11 @@ function convertPlantData(rawData) {
             Math.round(newMotor[key] * motorFactors[key] * 10) / 10;
         }
       });
+      // Defina manualmente a classe para cada motor pelo índice
+      if (idx === 0) newMotor.class = "I"; // Motor 1
+      if (idx === 1) newMotor.class = "I"; // Motor 2
+      if (idx === 2) newMotor.class = "III"; // Motor 3
+      // Adicione mais conforme necessário
       return newMotor;
     });
   }
@@ -79,6 +84,10 @@ export function PlantDataProvider({ children }) {
   const [data, setData] = useState({ sensors: {}, inverters: [] });
 
   useEffect(() => {
+    let lastCreatedAt = null;
+    let pollingInterval = null;
+    let fastInterval = null;
+
     const fetchData = async () => {
       try {
         const isDev = import.meta.env.MODE === "development";
@@ -109,12 +118,25 @@ export function PlantDataProvider({ children }) {
         // Converte os dados recebidos usando a função utilitária
         const convertedPlant = convertPlantData(plantResult);
         setData({ ...convertedPlant, inverters: invertersWithStatus });
+        // Detecta atualização instantânea
+        if (plantResult.createdAt && plantResult.createdAt !== lastCreatedAt) {
+          lastCreatedAt = plantResult.createdAt;
+          // Quando detecta novo dado, faz polling rápido por 1s
+          if (fastInterval) clearInterval(fastInterval);
+          fastInterval = setInterval(fetchData, 100);
+          setTimeout(() => {
+            if (fastInterval) clearInterval(fastInterval);
+          }, 1000);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-    const interval = setInterval(fetchData, 100);
-    return () => clearInterval(interval);
+    pollingInterval = setInterval(fetchData, 1000);
+    return () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+      if (fastInterval) clearInterval(fastInterval);
+    };
   }, []);
 
   // Exemplo dos campos disponíveis em usePlantData():
