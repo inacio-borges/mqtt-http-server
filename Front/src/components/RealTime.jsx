@@ -2,6 +2,7 @@ import React from "react";
 import { usePlantData } from "./PlantDataContext";
 import fc302Image from "/assets/fc302.jpg";
 import fc202Image from "/assets/fc202.jpg";
+import fc102Image from "/assets/fc102.png";
 import cfw500Image from "/assets/cfw500.jpg";
 import qgbtImage from "/assets/qgbt.avif";
 import fc51Image from "/assets/fc51.png"; // Adicione a imagem se existir
@@ -14,6 +15,7 @@ function RealTime() {
     const images = {
       fc302: fc302Image,
       fc202: fc202Image,
+      fc102: fc102Image,
       cfw500: cfw500Image,
       fc51: fc51Image,
     };
