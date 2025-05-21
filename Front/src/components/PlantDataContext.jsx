@@ -17,12 +17,12 @@ function convertPlantData(rawData) {
   };
   // Fatores para campos de inverters
   const inverterFactors = {
-    frequency: 0.01, // exemplo
-    voltage: 0.1,
-    DcVoltage: 0.1,
-    power: 0.1,
+    frequency: 1, // exemplo
+    voltage: 1,
+    DcVoltage: 1,
+    power: 1,
     rpm: 1,
-    temperature: 0.1,
+    temperature: 1,
     current: 0.01,
     // Adicione outros campos de inverter aqui
   };
@@ -48,16 +48,21 @@ function convertPlantData(rawData) {
   });
   // Converte campos dos inverters
   if (Array.isArray(converted.inverters)) {
-    converted.inverters = converted.inverters.map((inv) => {
-      const newInv = { ...inv };
-      Object.keys(inverterFactors).forEach((key) => {
-        if (newInv[key] !== undefined && newInv[key] !== null) {
-          newInv[key] =
-            Math.round(newInv[key] * inverterFactors[key] * 10) / 10;
-        }
+    if (converted.inverters.length > 0) {
+      converted.inverters = converted.inverters.map((inv) => {
+        const newInv = { ...inv };
+        Object.keys(inverterFactors).forEach((key) => {
+          if (newInv[key] !== undefined && newInv[key] !== null) {
+            newInv[key] =
+              Math.round(newInv[key] * inverterFactors[key] * 10) / 10;
+          }
+        });
+        return newInv;
       });
-      return newInv;
-    });
+    }
+  } else {
+    console.warn("Expected 'converted.inverters' to be an array, but got:", converted.inverters);
+    converted.inverters = []; // Fallback to an empty array
   }
   // Converte campos dos motors
   if (Array.isArray(converted.motors)) {
@@ -117,7 +122,9 @@ export function PlantDataProvider({ children }) {
         });
         // Converte os dados recebidos usando a função utilitária
         const convertedPlant = convertPlantData(plantResult);
-        setData({ ...convertedPlant, inverters: invertersWithStatus });
+        // Corrige: converte também os inverters já mesclados com status
+        const convertedInverters = convertPlantData({ inverters: invertersWithStatus }).inverters;
+        setData({ ...convertedPlant, inverters: convertedInverters });
         // Detecta atualização instantânea
         if (plantResult.createdAt && plantResult.createdAt !== lastCreatedAt) {
           lastCreatedAt = plantResult.createdAt;

@@ -265,16 +265,14 @@ const HomePage = () => {
                           </div>
                           <div>
                             Corrente:{" "}
-                            <strong>{inverter ? inverter.current : 0} A</strong>
+                            <strong>{inverter ? (inverter.current) : 0} A</strong>
                           </div>
                           <div>
                             RPM:{" "}
                             <strong>
                               {inverter
                                 ? (
-                                    ((inverter.frequency || 0) * 1790) /
-                                    60
-                                  ).toFixed(0)
+                                    ((inverter.rpm || 0)).toFixed(0))
                                 : 0}
                             </strong>
                           </div>
