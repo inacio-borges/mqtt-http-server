@@ -273,17 +273,16 @@ function HistoricoGrafico() {
     <div
       className="history-container"
       style={{
-        maxWidth: "85vw",
+        maxWidth: "100%", // Garante que o container nunca ultrapasse a viewport
         minHeight: window.innerWidth < 600 ? 400 : 700,
-        width: "100vw",
-        margin: 0,
+        width: "100vw", // Garante responsividade
         padding: window.innerWidth < 600 ? 4 : 24,
         borderRadius: window.innerWidth < 600 ? 8 : 18,
-        boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
-        alignItems: "center",
+        alignItems: "flex-start",
         justifyContent: "flex-start",
+        overflow: "hidden", // Evita overflow do conteúdo
       }}
     >
       <h1
@@ -328,15 +327,16 @@ function HistoricoGrafico() {
       <div
         className="chart-modern"
         style={{
-          minHeight: window.innerWidth < 600 ? 280 : 400,
+          minHeight: window.innerWidth < 700 ? 400 : 700,
+          height: window.innerWidth < 700 ? 400 : 700,
           width: "100%",
-          maxWidth: "100vw",
+          maxWidth: "100%", // Corrigido para não ultrapassar o container
+          boxSizing: "border-box",
           background: "#fff",
-          borderRadius: window.innerWidth < 600 ? 8 : 16,
+          borderRadius: window.innerWidth < 700 ? 8 : 16,
           boxShadow: "0 2px 16px #0001",
           overflowX: "auto",
-          padding: window.innerWidth < 600 ? 20 : 24,
-          boxSizing: "border-box",
+          padding: window.innerWidth < 700 ? 0 : 24,
         }}
       >
         <Line
